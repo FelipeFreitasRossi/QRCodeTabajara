@@ -1,0 +1,32 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 64px 0 24px;
+  text-align: center;
+  animation: enter var(--dur-slow) var(--ease-out) both;
+}
+
+.icon {
+  color: var(--c-gold);
+  margin-bottom: 4px;
+}
+
+.title {
+  font-size: 1.75rem;
+}
+
+.text {
+  max-width: 34ch;
+  margin-bottom: 12px;
+  color: var(--c-text-soft);
+  font-size: var(--fs-sm);
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+}

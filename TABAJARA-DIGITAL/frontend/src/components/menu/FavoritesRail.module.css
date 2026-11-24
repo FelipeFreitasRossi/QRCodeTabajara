@@ -1,0 +1,137 @@
+.section {
+  margin: 8px 0 28px;
+  animation: in 520ms var(--ease-out);
+}
+
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-text-soft);
+}
+
+.heart {
+  color: #e2526b;
+  fill: currentColor;
+}
+
+.count {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
+  font-size: 0.6875rem;
+  letter-spacing: 0;
+}
+
+.track {
+  display: flex;
+  gap: 10px;
+  margin: 0 calc(var(--page-pad) * -1);
+  padding: 2px var(--page-pad) 6px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  list-style: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.item {
+  flex: none;
+  scroll-snap-align: start;
+  animation: chip-in 460ms var(--ease-out) both;
+}
+
+.item:nth-child(2) {
+  animation-delay: 50ms;
+}
+.item:nth-child(3) {
+  animation-delay: 100ms;
+}
+.item:nth-child(n + 4) {
+  animation-delay: 150ms;
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateX(14px) scale(0.96);
+  }
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 240px;
+  padding: 6px 14px 6px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--c-bg-elev);
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+  text-align: left;
+  transition:
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.chip:hover {
+  box-shadow: inset 0 0 0 1px var(--c-gold-line);
+}
+
+.chip:active {
+  transform: scale(0.97);
+}
+
+.thumb {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.price {
+  font-size: var(--fs-xs);
+  color: var(--c-gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section,
+  .item {
+    animation: none;
+  }
+}

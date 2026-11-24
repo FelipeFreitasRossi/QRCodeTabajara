@@ -1,0 +1,207 @@
+.image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 42svh;
+}
+
+.ornament {
+  margin-bottom: 14px;
+}
+
+.content {
+  padding-top: 56px;
+}
+
+.noImage .close {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.ornament {
+  margin-bottom: 14px;
+}
+
+.scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 46svh;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 24px var(--page-pad) 28px;
+}
+
+.contentNoImage {
+  padding-top: 56px;
+}
+
+.featured {
+  margin-bottom: 8px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+}
+
+.name {
+  font-size: 2.25rem;
+  padding-right: 40px;
+}
+
+.price {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  font-weight: 600;
+  color: var(--c-gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--c-line-strong);
+  background: var(--c-surface-2);
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+}
+
+.description {
+  margin-top: 16px;
+  color: var(--c-text-soft);
+}
+
+.block {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--c-line);
+}
+
+.blockTitle {
+  margin-bottom: 10px;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.ingredients {
+  color: var(--c-text-soft);
+  font-size: var(--fs-sm);
+}
+
+.allergens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.allergen {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--c-gold-line);
+  background: var(--c-gold-soft);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--c-gold-bright);
+}
+
+.muted {
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+}
+
+.disclaimer {
+  margin-top: 14px;
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+}
+
+/* Rodapé fixo: quantidade, subtotal e "Adicionar ao carrinho" */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.subtotal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+}
+
+.subtotalLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.subtotalValue {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--c-gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 768px) {
+  .content {
+    padding: 28px 32px 32px;
+  }
+
+  .contentNoImage {
+    padding-top: 60px;
+  }
+}
+
+/* ---------- favoritar ---------- */
+.media {
+  position: relative;
+}
+
+.heartOnImage {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titleRow .name {
+  flex: 1;
+}

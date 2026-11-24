@@ -1,0 +1,130 @@
+.content {
+  padding: 56px var(--page-pad) 24px;
+}
+
+.ornament {
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: 2.25rem;
+}
+
+.subtitle {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.125rem;
+  color: var(--c-text-muted);
+}
+
+/* Vazio */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 0 24px;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--c-line-strong);
+  color: var(--c-gold);
+}
+
+.emptyTitle {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.emptyText {
+  max-width: 30ch;
+  margin-bottom: 12px;
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+}
+
+/* Rodapé fixo */
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.totalRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.totalLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.totalValue {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--c-gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+}
+
+.footerActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+@media (min-width: 768px) {
+  .content {
+    padding: 56px 32px 24px;
+  }
+}
+
+.lastOrder {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  margin-top: 8px;
+  font-size: var(--fs-sm);
+  color: var(--c-gold-bright);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.lastOrder:hover {
+  border-bottom-color: var(--c-gold-line);
+}
+
+.perks {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--c-gold-soft);
+  color: var(--c-gold-bright);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+}

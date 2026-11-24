@@ -1,0 +1,28 @@
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 36px var(--page-pad) calc(var(--safe-bottom) + 56px);
+  color: var(--c-text-soft);
+  line-height: 1.7;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+}
+
+.title {
+  margin: 8px 0 20px;
+  font-size: clamp(2rem, 8vw, 2.75rem);
+  line-height: 1.1;
+  color: var(--c-text);
+}
+
+.page h2 {
+  margin: 26px 0 6px;
+  font-size: 1.5rem;
+  color: var(--c-text);
+}

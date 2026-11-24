@@ -1,0 +1,48 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--c-line-strong);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.recebido {
+  color: #f2c879;
+  border-color: rgba(242, 200, 121, 0.4);
+  background: rgba(242, 200, 121, 0.1);
+}
+
+.em_preparo {
+  color: #f0a46a;
+  border-color: rgba(240, 164, 106, 0.4);
+  background: rgba(240, 164, 106, 0.1);
+}
+
+.pronto {
+  color: #8fd19e;
+  border-color: rgba(143, 209, 158, 0.4);
+  background: rgba(143, 209, 158, 0.1);
+}
+
+.entregue {
+  color: var(--c-text-muted);
+}
+
+.cancelado {
+  color: #e3a184;
+  border-color: rgba(227, 161, 132, 0.35);
+}

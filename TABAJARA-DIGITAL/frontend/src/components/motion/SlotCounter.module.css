@@ -1,0 +1,63 @@
+.counter {
+  display: inline-flex;
+  align-items: baseline;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.window {
+  position: relative;
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  /* desfoca a entrada/saída dos números nas bordas da "janela" */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+  padding: 0 0.01em;
+}
+
+.strip {
+  display: flex;
+  flex-direction: column;
+  transition-property: transform;
+  /* acelera, gira e assenta com um pequeno "tranco" ao parar */
+  transition-timing-function: cubic-bezier(0.2, 0.75, 0.25, 1.04);
+  will-change: transform;
+}
+
+.moving .digit {
+  /* rastro de movimento leve durante o giro */
+  animation: blur 1s ease-out;
+}
+
+@keyframes blur {
+  0%,
+  60% {
+    filter: blur(0.6px);
+  }
+  100% {
+    filter: none;
+  }
+}
+
+.digit {
+  display: block;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+}
+
+.separator {
+  display: inline-block;
+  padding: 0 0.02em;
+}
+
+/* degradê dourado em cada algarismo (no elemento pai vazaria os números escondidos da roda) */
+.gold .digit,
+.gold .separator,
+.gold .plain {
+  background: linear-gradient(180deg, #fff3d2 8%, #dbbd80 55%, #9c7a3c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

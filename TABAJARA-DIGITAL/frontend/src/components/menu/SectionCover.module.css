@@ -1,0 +1,156 @@
+/*
+ * Foto da seção ("alternating corner image gradient").
+ * Ocupa um quadrante da seção — metade da largura × metade da altura (25% da área,
+ * como 1 dos 4 quadrados de uma seção 2×2) —, ancorada no canto superior, alternando
+ * de lado. O degradê é radial e suave a partir do canto: vai apagando aos poucos,
+ * sem bordas retas. Fica atrás do conteúdo (a seção cria o contexto com isolation).
+ */
+.cover {
+  position: absolute;
+  top: -48px; /* começa um pouco acima da seção para o topo também se dissolver */
+  z-index: -1;
+  width: 50%;
+  height: 50%;
+  min-height: 300px;
+  max-height: 620px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  /* as duas camadas do degradê se somam: radial a partir do canto + suavização no topo */
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  transition: opacity 1.6s var(--ease-out);
+}
+
+.cover[data-visible='true'] {
+  opacity: 0.95;
+}
+
+.cover img {
+  --parallax: 0px;
+  display: block;
+  width: 100%;
+  height: calc(100% + 80px);
+  margin-top: -40px;
+  object-fit: cover;
+  filter: saturate(1.05) brightness(0.95) contrast(1.05);
+  transform: translate3d(0, var(--parallax), 0) scale(1.1);
+  transition: transform 2s var(--ease-out);
+  will-change: transform;
+}
+
+.cover[data-visible='true'] img {
+  transform: translate3d(0, var(--parallax), 0) scale(1);
+}
+
+/*
+ * Degradê "easing": muitas paradas com opacidade caindo em curva suave
+ * (forte no canto, bem gradual no meio, invisível nas bordas).
+ */
+.right {
+  right: calc(var(--page-pad) * -1);
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse 100% 100% at 100% 0%,
+      #000 0%,
+      #000 22%,
+      rgba(0, 0, 0, 0.92) 34%,
+      rgba(0, 0, 0, 0.8) 45%,
+      rgba(0, 0, 0, 0.64) 55%,
+      rgba(0, 0, 0, 0.46) 64%,
+      rgba(0, 0, 0, 0.29) 73%,
+      rgba(0, 0, 0, 0.15) 82%,
+      rgba(0, 0, 0, 0.05) 91%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.35) 8%, rgba(0, 0, 0, 0.75) 16%, #000 26%);
+  mask-image:
+    radial-gradient(
+      ellipse 100% 100% at 100% 0%,
+      #000 0%,
+      #000 22%,
+      rgba(0, 0, 0, 0.92) 34%,
+      rgba(0, 0, 0, 0.8) 45%,
+      rgba(0, 0, 0, 0.64) 55%,
+      rgba(0, 0, 0, 0.46) 64%,
+      rgba(0, 0, 0, 0.29) 73%,
+      rgba(0, 0, 0, 0.15) 82%,
+      rgba(0, 0, 0, 0.05) 91%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.35) 8%, rgba(0, 0, 0, 0.75) 16%, #000 26%);
+}
+
+.left {
+  left: calc(var(--page-pad) * -1);
+  -webkit-mask-image:
+    radial-gradient(
+      ellipse 100% 100% at 0% 0%,
+      #000 0%,
+      #000 22%,
+      rgba(0, 0, 0, 0.92) 34%,
+      rgba(0, 0, 0, 0.8) 45%,
+      rgba(0, 0, 0, 0.64) 55%,
+      rgba(0, 0, 0, 0.46) 64%,
+      rgba(0, 0, 0, 0.29) 73%,
+      rgba(0, 0, 0, 0.15) 82%,
+      rgba(0, 0, 0, 0.05) 91%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.35) 8%, rgba(0, 0, 0, 0.75) 16%, #000 26%);
+  mask-image:
+    radial-gradient(
+      ellipse 100% 100% at 0% 0%,
+      #000 0%,
+      #000 22%,
+      rgba(0, 0, 0, 0.92) 34%,
+      rgba(0, 0, 0, 0.8) 45%,
+      rgba(0, 0, 0, 0.64) 55%,
+      rgba(0, 0, 0, 0.46) 64%,
+      rgba(0, 0, 0, 0.29) 73%,
+      rgba(0, 0, 0, 0.15) 82%,
+      rgba(0, 0, 0, 0.05) 91%,
+      transparent 100%
+    ),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.35) 8%, rgba(0, 0, 0, 0.75) 16%, #000 26%);
+}
+
+/* Celular: o quadrante ficaria estreito demais; usa ~70% da largura e altura de cabeçalho. */
+@media (max-width: 899px) {
+  .cover {
+    width: 72%;
+    height: 50%;
+    min-height: 280px;
+    max-height: 380px;
+  }
+
+  .cover[data-visible='true'] {
+    opacity: 0.85;
+  }
+}
+
+/* Telas maiores: o quadrante vai até a borda da tela, para não "cortar" a foto no meio da margem. */
+@media (min-width: 900px) {
+  .right,
+  .left {
+    width: calc(50% + (100vw - 100%) / 2);
+  }
+
+  .right {
+    right: calc((100% - 100vw) / 2);
+  }
+
+  .left {
+    left: calc((100% - 100vw) / 2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover,
+  .cover img {
+    transition: none;
+  }
+  .cover img {
+    transform: none;
+  }
+}

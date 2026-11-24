@@ -1,0 +1,70 @@
+/* Identidade visual do Tabajara: preto, grafite, tons neutros quentes e dourado discreto.
+   Altere aqui para ajustar cores, fontes e espaçamentos do sistema inteiro. */
+
+:root {
+  /* Cores */
+  --c-bg: #0c0c0b;
+  --c-bg-elev: #121211;
+  --c-surface: #171715;
+  --c-surface-2: #1f1e1b;
+  --c-graphite: #2a2926;
+  --c-line: rgba(255, 255, 255, 0.07);
+  --c-line-strong: rgba(255, 255, 255, 0.13);
+
+  --c-text: #f3efe6;
+  --c-text-soft: #cdc7ba;
+  --c-text-muted: #969083;
+
+  --c-gold: #c6a15b;
+  --c-gold-bright: #dbbd80;
+  --c-gold-soft: rgba(198, 161, 91, 0.13);
+  --c-gold-line: rgba(198, 161, 91, 0.38);
+
+  --c-overlay: rgba(6, 6, 5, 0.72);
+
+  /* Tipografia */
+  --font-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --font-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Números (preços, pontos, totais): algarismos alinhados e de mesma largura */
+  --font-num: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+
+  /* Formas e sombras */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 12px 32px -14px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 28px 70px -24px rgba(0, 0, 0, 0.85);
+
+  /* Movimento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur: 320ms;
+  --dur-slow: 750ms;
+
+  /* Layout */
+  --header-h: 60px;
+  --nav-h: 56px;
+  --page-pad: 20px;
+  --content-max: 1080px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --touch: 44px; /* área mínima de toque recomendada */
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 68px;
+    --page-pad: 32px;
+  }
+}

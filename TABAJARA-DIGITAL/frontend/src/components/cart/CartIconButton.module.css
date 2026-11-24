@@ -1,0 +1,58 @@
+.button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  border-radius: 50%;
+  color: var(--c-text);
+  text-decoration: none;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.button:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.button:active {
+  transform: scale(0.94);
+}
+
+.filled {
+  color: var(--c-gold-bright);
+}
+
+.current {
+  background: var(--c-gold-soft);
+  color: var(--c-gold-bright);
+}
+
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--c-gold);
+  color: #17140e;
+  font-size: 0.625rem;
+  font-weight: 800;
+  box-shadow: 0 0 0 2px var(--c-bg);
+  animation: pop 420ms var(--ease-out);
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.3);
+  }
+  60% {
+    transform: scale(1.3);
+  }
+}

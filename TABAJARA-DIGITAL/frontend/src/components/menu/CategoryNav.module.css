@@ -1,0 +1,100 @@
+.nav {
+  position: sticky;
+  top: calc(var(--header-h) + var(--safe-top));
+  z-index: 30;
+  margin: 0 calc(-1 * var(--page-pad));
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-line);
+  transition:
+    background-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+}
+
+.nav[data-stuck='true'] {
+  background: rgba(12, 12, 11, 0.9);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: 0 16px 28px -22px rgba(0, 0, 0, 0.95);
+}
+
+.list {
+  position: relative;
+  display: flex;
+  height: var(--nav-h);
+  padding: 0 calc(var(--page-pad) - 14px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs {
+  display: flex;
+  flex: 1 0 auto;
+}
+
+.tabs li {
+  flex: none;
+  display: flex;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  color: var(--c-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color var(--dur) var(--ease-out);
+}
+
+.tab:hover {
+  color: var(--c-text-soft);
+}
+
+.active,
+.active:hover {
+  color: var(--c-text);
+}
+
+/* Traço dourado que desliza até a categoria ativa */
+.indicator {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  width: 0;
+  border-radius: 2px;
+  background: var(--c-gold);
+  box-shadow: 0 0 12px rgba(198, 161, 91, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 450ms var(--ease-out),
+    width 450ms var(--ease-out),
+    opacity var(--dur) var(--ease-out);
+}
+
+@media (min-width: 1024px) {
+  .list {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  /* centraliza as categorias sem cortar a primeira quando não couberem */
+  .tabs li:first-child {
+    margin-left: auto;
+  }
+
+  .tabs li:last-child {
+    margin-right: auto;
+  }
+}

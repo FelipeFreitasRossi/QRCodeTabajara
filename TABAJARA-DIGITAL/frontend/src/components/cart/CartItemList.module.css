@@ -1,0 +1,182 @@
+.list {
+  margin-top: 20px;
+}
+
+.item:first-child {
+  border-top: 0;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 14px;
+  padding: 16px 0;
+  border-top: 1px solid var(--c-line);
+  animation: enter 400ms var(--ease-out) both;
+}
+
+.thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.thumbEmpty {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c-gold-line);
+  background: var(--c-gold-soft);
+  color: var(--c-gold);
+  font-size: 1.125rem;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.topRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.lineTotal {
+  flex: none;
+  font-size: 1.0625rem;
+  color: var(--c-gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.controls .remove {
+  margin-right: -6px;
+}
+
+.remove {
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  border-radius: 50%;
+  color: var(--c-text-muted);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out);
+}
+
+.remove:hover {
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.warning {
+  color: var(--c-gold-bright);
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+}
+
+/* ---------- Variante da página /carrinho: linhas limpas, separadas por filetes ---------- */
+
+.cards {
+  margin-top: 0;
+}
+
+.cards .item {
+  grid-template-columns: 76px 1fr;
+  gap: 16px;
+  padding: 18px 0;
+}
+
+.cards .item:first-child {
+  padding-top: 6px;
+}
+
+.cards .thumb {
+  width: 76px;
+  height: 76px;
+  border-radius: 14px;
+}
+
+.cards .lineTotal {
+  font-size: 1.125rem;
+}
+
+/* ---------- Movimento ---------- */
+
+/* valor da linha "pisca" em dourado quando a quantidade muda */
+.lineTotal {
+  animation: bump 420ms var(--ease-out);
+}
+
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.12);
+    color: #fff3d2;
+  }
+}
+
+.leaving {
+  overflow: hidden;
+  pointer-events: none;
+  animation: leave 300ms var(--ease-in-out) forwards;
+}
+
+@keyframes leave {
+  0% {
+    opacity: 1;
+    max-height: 220px;
+  }
+  45% {
+    opacity: 0;
+    transform: translateX(-28px);
+    max-height: 220px;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-28px);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    border-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lineTotal,
+  .leaving {
+    animation: none;
+  }
+}

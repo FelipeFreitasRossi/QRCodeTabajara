@@ -1,0 +1,29 @@
+.ornament {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--c-gold);
+}
+
+.line {
+  width: 36px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.center .line:first-child {
+  background: linear-gradient(90deg, transparent, currentColor);
+}
+
+.center .line:last-child,
+.left .line {
+  background: linear-gradient(90deg, currentColor, transparent);
+}
+
+.diamond {
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  transform: rotate(45deg);
+}

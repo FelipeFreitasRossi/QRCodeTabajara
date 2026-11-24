@@ -1,0 +1,75 @@
+.money {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-num);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings:
+    'tnum' 1,
+    'lnum' 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.visual {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.int {
+  font-weight: 700;
+}
+
+.cur {
+  margin-right: 0.22em;
+  font-size: 0.58em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0.72;
+}
+
+.dec {
+  font-weight: 600;
+}
+
+/* centavos pequenos e elevados, como em cardápio impresso */
+.sup .dec {
+  align-self: flex-start;
+  margin-top: 0.12em;
+  margin-left: 0.04em;
+  font-size: 0.56em;
+  line-height: 1;
+}
+
+.sup .comma {
+  display: none; /* centavos elevados dispensam a vírgula (leitores de tela usam o texto completo) */
+}
+
+.plain .comma,
+.plain .dec {
+  font-size: 0.86em;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.sign {
+  margin-right: 0.08em;
+  font-weight: 600;
+}
+
+.points .unit {
+  margin-left: 0.18em;
+  font-size: 0.62em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

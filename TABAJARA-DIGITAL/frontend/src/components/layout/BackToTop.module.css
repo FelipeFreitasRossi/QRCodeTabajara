@@ -1,0 +1,38 @@
+.button {
+  position: fixed;
+  right: max(16px, calc((100vw - var(--content-max)) / 2));
+  bottom: calc(var(--safe-bottom) + 20px);
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--c-gold-line);
+  border-radius: 50%;
+  background: rgba(23, 23, 21, 0.88);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--c-gold-bright);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 16px, 0) scale(0.9);
+  transition:
+    opacity var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out),
+    bottom var(--dur) var(--ease-out);
+}
+
+.raised {
+  bottom: calc(var(--safe-bottom) + 92px);
+}
+
+.button[data-visible='true'] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+.button:active {
+  transform: scale(0.92);
+}

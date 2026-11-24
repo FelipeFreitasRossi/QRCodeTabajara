@@ -1,0 +1,209 @@
+.stage {
+  perspective: 1100px;
+  display: grid;
+  place-items: center;
+  padding: 8px 0 4px;
+  touch-action: pan-y;
+}
+
+.card {
+  --gx: 50%;
+  --gy: 50%;
+  position: relative;
+  width: min(100%, 400px);
+  aspect-ratio: 1.586; /* proporção de cartão de crédito */
+  padding: 22px 22px 18px;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #f6ecd6;
+  background:
+    radial-gradient(130% 90% at 0% 0%, #2b2619 0%, transparent 55%),
+    linear-gradient(150deg, #191712 0%, #0b0a09 55%, #1a1610 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 0 0 1px rgba(219, 189, 128, 0.35) inset,
+    0 40px 80px -30px rgba(0, 0, 0, 0.95),
+    0 18px 40px -24px rgba(198, 161, 91, 0.45);
+  transform-style: preserve-3d;
+  transition: transform 120ms linear;
+  will-change: transform;
+  animation: card-in 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.settling {
+  transition: transform 600ms var(--ease-out);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(40px) rotateX(38deg) scale(0.9);
+  }
+}
+
+/* borda e linhas com efeito de folha dourada */
+.foil {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from 210deg at var(--gx) var(--gy), #6d5428, #f3dca5, #9c7a3c, #fff1c9, #6d5428);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* reflexo que segue a inclinação */
+.glare {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 50% at var(--gx) var(--gy), rgba(255, 238, 200, 0.22), transparent 70%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* padrão guilhoché discreto */
+.pattern {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-radial-gradient(
+    circle at 110% 120%,
+    transparent 0 14px,
+    rgba(219, 189, 128, 0.06) 14px 15px
+  );
+  pointer-events: none;
+}
+
+/* brilho que atravessa o cartão */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: -50% auto -50% -40%;
+  width: 30%;
+  background: linear-gradient(100deg, transparent, rgba(255, 244, 214, 0.16), transparent);
+  transform: skewX(-20deg);
+  animation: sweep 6s var(--ease-in-out) 1.4s infinite;
+  pointer-events: none;
+}
+
+@keyframes sweep {
+  0%,
+  55% {
+    left: -40%;
+  }
+  100% {
+    left: 140%;
+  }
+}
+
+.top,
+.bottom {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: linear-gradient(180deg, #fff1c9, #c6a15b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand svg {
+  color: #e3c788;
+}
+
+.tier {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(219, 189, 128, 0.45);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #e3c788;
+}
+
+.chip {
+  position: relative;
+  width: 44px;
+  height: 34px;
+  border-radius: 7px;
+  background:
+    linear-gradient(90deg, transparent 47%, rgba(0, 0, 0, 0.35) 47% 53%, transparent 53%),
+    linear-gradient(
+      0deg,
+      transparent 30%,
+      rgba(0, 0, 0, 0.3) 30% 34%,
+      transparent 34% 66%,
+      rgba(0, 0, 0, 0.3) 66% 70%,
+      transparent 70%
+    ),
+    linear-gradient(135deg, #f3dca5, #9c7a3c 60%, #e8cf98);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.label {
+  display: block;
+  font-size: 0.5625rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(246, 236, 214, 0.5);
+}
+
+.name {
+  display: block;
+  margin-top: 2px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.right {
+  text-align: right;
+}
+
+.since {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.cpf {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  translate: 0 -50%;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  color: rgba(246, 236, 214, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card::after {
+    animation: none;
+  }
+}

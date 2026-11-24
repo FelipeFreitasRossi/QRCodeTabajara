@@ -1,0 +1,155 @@
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0 24px;
+  padding: 16px 16px 16px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--c-gold-line);
+  background: linear-gradient(135deg, rgba(198, 161, 91, 0.1), rgba(198, 161, 91, 0.02));
+  overflow: hidden;
+  animation: in 600ms var(--ease-out);
+}
+
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.credited {
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(219, 189, 128, 0.28), transparent 60%),
+    linear-gradient(135deg, #1f1b13, #121110);
+  animation: celebrate 900ms cubic-bezier(0.17, 0.89, 0.32, 1.28);
+}
+
+@keyframes celebrate {
+  0% {
+    transform: scale(0.96);
+    box-shadow: 0 0 0 0 rgba(219, 189, 128, 0.6);
+  }
+  60% {
+    box-shadow: 0 0 0 14px rgba(219, 189, 128, 0);
+  }
+}
+
+.cancelled {
+  border-color: var(--c-line);
+  background: var(--c-bg-elev);
+  opacity: 0.8;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--c-gold-soft);
+  color: var(--c-gold-bright);
+}
+
+.credited .icon {
+  background: linear-gradient(135deg, var(--c-gold-bright), #9c7a3c);
+  color: #17140e;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+}
+
+.big {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  font-family: var(--font-num);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--c-gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-text-soft);
+}
+
+.text {
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+
+/* barra "aguardando entrega" */
+.track {
+  position: relative;
+  display: block;
+  height: 3px;
+  margin-top: 10px;
+  border-radius: 2px;
+  background: var(--c-line-strong);
+  overflow: hidden;
+}
+
+.track span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 35%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--c-gold-bright), transparent);
+  animation: wait 1.8s var(--ease-in-out) infinite;
+}
+
+@keyframes wait {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+.link {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--touch);
+  height: var(--touch);
+  border-radius: 50%;
+  border: 1px solid var(--c-gold-line);
+  color: var(--c-gold-bright);
+}
+
+.link:hover {
+  background: var(--c-gold-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .credited,
+  .track span {
+    animation: none;
+  }
+}
+
+.amount {
+  display: inline-flex;
+  align-items: baseline;
+}

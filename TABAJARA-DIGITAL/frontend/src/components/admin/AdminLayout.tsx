@@ -1,0 +1,144 @@
+import {
+  Armchair,
+  ClipboardList,
+  Crown,
+  ExternalLink,
+  LayoutDashboard,
+  LogOut,
+  Tags,
+  UtensilsCrossed,
+  Volume2,
+  VolumeX,
+} from 'lucide-react'
+import { NavLink, Outlet } from 'react-router-dom'
+
+import { AdminProvider } from '../../contexts/AdminProvider'
+import { useAdmin } from '../../hooks/useAdmin'
+import { useAuth } from '../../hooks/useAuth'
+import { cx } from '../../utils/dom'
+import { Logo } from '../ui/Logo'
+import styles from './AdminLayout.module.css'
+
+const NAV = [
+  { to: '/admin', label: 'Painel', short: 'Painel', icon: LayoutDashboard, end: true },
+  { to: '/admin/pedidos', label: 'Pedidos', short: 'Pedidos', icon: ClipboardList, end: false },
+  { to: '/admin/produtos', label: 'Produtos', short: 'Produtos', icon: UtensilsCrossed, end: false },
+  { to: '/admin/categorias', label: 'Categorias', short: 'Categorias', icon: Tags, end: false },
+  { to: '/admin/mesas', label: 'Mesas e QR Codes', short: 'Mesas', icon: Armchair, end: false },
+  { to: '/admin/clube', label: 'Clube Tabajara', short: 'Clube', icon: Crown, end: false },
+]
+
+function Shell() {
+  const { admin, logout } = useAuth()
+  const { pendingCount, soundOn, toggleSound } = useAdmin()
+
+  const soundButton = (
+    <button
+      type="button"
+      className={styles.iconButton}
+      onClick={toggleSound}
+      aria-pressed={soundOn}
+      aria-label={soundOn ? 'Desativar som de novos pedidos' : 'Ativar som de novos pedidos'}
+      title={soundOn ? 'Som de novos pedidos: ligado' : 'Som de novos pedidos: desligado'}
+    >
+      {soundOn ? <Volume2 size={18} strokeWidth={1.75} /> : <VolumeX size={18} strokeWidth={1.75} />}
+    </button>
+  )
+
+  return (
+    <div className={styles.shell}>
+      {/* Barra lateral (computador/tablet) */}
+      <aside className={styles.sidebar}>
+        <div className={styles.brand}>
+          <Logo size="sm" />
+          <span className={styles.brandTag}>Painel</span>
+        </div>
+        <nav className={styles.nav} aria-label="Menu do painel">
+          {NAV.map(({ to, label, icon: Icon, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={({ isActive }) => cx(styles.navLink, isActive && styles.active)}
+            >
+              <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
+              <span>{label}</span>
+              {to === '/admin/pedidos' && pendingCount > 0 && (
+                <span className={styles.badge} aria-label={`${pendingCount} novos`}>
+                  {pendingCount}
+                </span>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+        <div className={styles.sidebarFooter}>
+          <a href="/cardapio" target="_blank" rel="noopener noreferrer" className={styles.navLink}>
+            <ExternalLink size={18} strokeWidth={1.75} aria-hidden="true" />
+            <span>Ver cardápio</span>
+          </a>
+          <div className={styles.user}>
+            <div className={styles.userInfo}>
+              <span className={styles.userName}>{admin?.name}</span>
+              <span className={styles.userEmail}>{admin?.email}</span>
+            </div>
+            {soundButton}
+            <button
+              type="button"
+              className={styles.iconButton}
+              onClick={logout}
+              aria-label="Sair do painel"
+              title="Sair"
+            >
+              <LogOut size={18} strokeWidth={1.75} />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Barra superior (celular) */}
+      <header className={styles.topbar}>
+        <div className={styles.brand}>
+          <Logo size="sm" />
+          <span className={styles.brandTag}>Painel</span>
+        </div>
+        <div className={styles.topActions}>
+          {soundButton}
+          <button type="button" className={styles.iconButton} onClick={logout} aria-label="Sair do painel">
+            <LogOut size={18} strokeWidth={1.75} />
+          </button>
+        </div>
+      </header>
+
+      <main className={styles.main}>
+        <Outlet />
+      </main>
+
+      {/* Navegação inferior (celular) */}
+      <nav className={styles.tabbar} aria-label="Menu do painel">
+        {NAV.map(({ to, short, icon: Icon, end }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            className={({ isActive }) => cx(styles.tab, isActive && styles.tabActive)}
+          >
+            <span className={styles.tabIcon}>
+              <Icon size={20} strokeWidth={1.75} aria-hidden="true" />
+              {to === '/admin/pedidos' && pendingCount > 0 && <span className={styles.tabBadge}>{pendingCount}</span>}
+            </span>
+            <span>{short}</span>
+          </NavLink>
+        ))}
+      </nav>
+    </div>
+  )
+}
+
+/** Estrutura do painel: menu lateral (ou inferior no celular) + conteúdo da página. */
+export function AdminLayout() {
+  return (
+    <AdminProvider>
+      <Shell />
+    </AdminProvider>
+  )
+}

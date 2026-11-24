@@ -1,0 +1,135 @@
+.section {
+  margin-top: 4px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 1.5rem;
+}
+
+.hint {
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+}
+
+.track {
+  display: flex;
+  gap: 12px;
+  margin: 0 calc(var(--page-pad) * -1);
+  padding: 2px var(--page-pad) 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  list-style: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .track {
+    margin: 0;
+    padding: 2px 0 8px;
+  }
+}
+
+.item {
+  flex: none;
+  width: 136px;
+  scroll-snap-align: start;
+  animation: in 480ms var(--ease-out) both;
+}
+
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--c-line);
+  background: var(--c-bg-elev);
+  text-align: left;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.card:hover {
+  border-color: var(--c-gold-line);
+}
+
+.card:active {
+  transform: scale(0.97);
+}
+
+.media {
+  position: relative;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+}
+
+.plus {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  color: #17140e;
+  box-shadow:
+    0 0 0 3px rgba(12, 12, 11, 0.55),
+    0 8px 18px -8px rgba(0, 0, 0, 0.9);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.card:hover .plus {
+  transform: rotate(90deg) scale(1.08);
+}
+
+.name {
+  display: -webkit-box;
+  overflow: hidden;
+  min-height: 2.5em;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.25;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.price {
+  font-size: var(--fs-sm);
+  color: var(--c-gold-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    animation: none;
+  }
+}

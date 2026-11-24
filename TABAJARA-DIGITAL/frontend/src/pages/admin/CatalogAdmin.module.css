@@ -1,0 +1,251 @@
+/* Estilos compartilhados pelas telas de Categorias e Mesas */
+
+.addCard {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-bg-elev);
+}
+
+.list {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-bg-elev);
+  overflow: hidden;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 14px;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.row + .row {
+  border-top: 1px solid var(--c-line);
+}
+
+.index {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.125rem;
+  color: var(--c-gold);
+}
+
+.rowInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-family: var(--font-display);
+  font-size: 1.3125rem;
+  font-weight: 600;
+}
+
+.editFields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rowActions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--c-text-soft);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.iconButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--c-text);
+}
+
+.iconButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.danger:hover:not(:disabled) {
+  color: #e3a184;
+}
+
+.muted {
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+}
+
+.empty {
+  padding: 18px;
+  border: 1px dashed var(--c-line-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+
+/* Mesas */
+.tableGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.tableCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 14px 6px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--c-bg-elev);
+  transition: opacity var(--dur) var(--ease-out);
+}
+
+.inactive {
+  opacity: 0.55;
+}
+
+.tableHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tableNumber {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--c-gold-bright);
+}
+
+@media (min-width: 768px) {
+  .addCard {
+    grid-template-columns: 1fr 1.4fr auto;
+  }
+
+  .row {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .rowActions {
+    grid-column: auto;
+  }
+}
+
+/* ---------- QR Code das mesas ---------- */
+.qrActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--c-line);
+}
+
+.qrButton {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--c-gold-line);
+  color: var(--c-gold-bright);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.qrButton:hover {
+  background: var(--c-gold-soft);
+}
+
+.tableCard {
+  padding-bottom: 12px;
+}
+
+/* ---------- foto da seção (categorias) ---------- */
+.sectionPhoto {
+  position: relative;
+  flex: none;
+}
+
+.sectionPhotoPick {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px dashed var(--c-gold-line);
+  color: var(--c-gold);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.sectionPhotoPick:hover {
+  border-color: var(--c-gold);
+}
+
+.sectionPhotoPick[aria-busy='true'] {
+  opacity: 0.5;
+}
+
+.sectionPhotoImg {
+  width: 100%;
+  height: 100%;
+}
+
+.sectionPhotoRemove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--c-surface-2);
+  box-shadow: 0 0 0 1px var(--c-line-strong);
+  color: var(--c-text-muted);
+}
+
+.sectionPhotoRemove:hover {
+  color: #f3b0a6;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.rowMain {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}

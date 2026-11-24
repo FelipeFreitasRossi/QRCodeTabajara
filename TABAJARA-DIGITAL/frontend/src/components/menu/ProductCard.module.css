@@ -1,0 +1,225 @@
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  align-items: start;
+  width: calc(100% + 24px);
+  margin: 0 -12px;
+  padding: 20px 12px;
+  border-radius: var(--radius-md);
+  text-align: left;
+  transition:
+    background-color var(--dur) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.withImage {
+  grid-template-columns: 1fr 96px;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    background: linear-gradient(90deg, rgba(198, 161, 91, 0.05), transparent 80%);
+  }
+
+  .card:hover .name {
+    color: var(--c-gold-bright);
+  }
+
+  .card:hover .leader {
+    opacity: 0.7;
+  }
+
+  .card:hover .thumb img {
+    transform: scale(1.06);
+  }
+}
+
+.card:active {
+  transform: scale(0.99);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Nome ........................ R$ 00,00 */
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.name {
+  flex: 0 1 auto;
+  font-family: var(--font-display);
+  font-size: 1.4375rem;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--c-text);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.star {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 0.75em;
+  color: var(--c-gold);
+  transform: translateY(-0.12em);
+}
+
+.leader {
+  flex: 1 1 18px;
+  min-width: 18px;
+  height: 1px;
+  border-bottom: 1px dotted var(--c-gold-line);
+  opacity: 0.9;
+  transform: translateY(-0.3em);
+  transition: opacity var(--dur) var(--ease-out);
+}
+
+.price {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: 1.3125rem;
+  font-weight: 600;
+  color: var(--c-gold-bright);
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 60ch;
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--c-text-soft);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 2px;
+}
+
+.allergens {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+}
+
+.allergens svg {
+  flex: none;
+  color: var(--c-gold);
+  opacity: 0.85;
+}
+
+.inCart {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--c-gold);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #17140e;
+  animation: pop 360ms var(--ease-out);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+.badge {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--c-line-strong);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--c-text-soft);
+}
+
+.thumb {
+  width: 96px;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+}
+
+.thumb img {
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform 1s var(--ease-out),
+    filter var(--dur-slow) var(--ease-out);
+}
+
+/* Produto indisponível: continua visível, mas claramente identificado */
+.unavailable .name,
+.unavailable .description,
+.unavailable .price,
+.unavailable .star {
+  opacity: 0.5;
+}
+
+.unavailable .price {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+@media (min-width: 768px) {
+  .withImage {
+    grid-template-columns: 1fr 116px;
+    gap: 22px;
+  }
+
+  .thumb {
+    width: 116px;
+  }
+
+  .name {
+    font-size: 1.5rem;
+  }
+}
+
+/* ---------- favoritar (fica fora do botão do cartão) ---------- */
+.root {
+  position: relative;
+}
+
+.heart {
+  position: absolute;
+  right: 0;
+  bottom: 18px;
+  z-index: 1;
+}
+
+/* cartão sem foto: reserva espaço para o coração no canto */
+.root:not(.rootWithImage) .body {
+  padding-right: 44px;
+}
+
+.root:not(.rootWithImage) .description {
+  padding-right: 0;
+}
+
+/* com foto: coração sobre o canto da miniatura */
+.rootWithImage .heart {
+  right: 4px;
+  bottom: auto;
+  top: 26px;
+}
