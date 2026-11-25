@@ -6,6 +6,9 @@ from pathlib import Path
 from app.core.config import settings
 from app.models import Category, DiningTable, Product
 from app.schemas.catalog import CategoryOut, ProductOut, TableOut
+from app.services.media_service import delete_uploaded_file
+
+__all__ = ["delete_uploaded_file"]  # mantido aqui para as rotas que já importam daqui
 
 
 async def category_out(category: Category, product_count: int | None = None) -> CategoryOut:
@@ -60,16 +63,6 @@ def table_qr_url(table: DiningTable) -> str | None:
     if not table.qr_token:
         return None
     return f"{settings.public_site_url.rstrip('/')}/m/{table.qr_token}"
-
-
-def delete_uploaded_file(url: str | None) -> None:
-    """Apaga uma foto antiga de /uploads, com proteção para nunca sair dessa pasta."""
-    if not url or not url.startswith("/uploads/"):
-        return
-    uploads = settings.uploads_dir.resolve()
-    path = (uploads / url.removeprefix("/uploads/")).resolve()
-    if uploads in path.parents and path.is_file():
-        path.unlink(missing_ok=True)
 
 
 async def next_product_position(category_id) -> int:

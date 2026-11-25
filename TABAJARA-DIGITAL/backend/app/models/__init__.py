@@ -10,6 +10,7 @@ from app.models.loyalty import (
 from app.models.order import Order, OrderItem, OrderStatus
 from app.models.product import Product
 from app.models.reward import BirthdayGift, Reward
+from app.models.stored_file import StoredFile
 from app.models.table import DiningTable
 
 # Todos os documentos registrados no Beanie. Ao criar um novo modelo, adicione aqui.
@@ -25,12 +26,14 @@ DOCUMENT_MODELS = [
     LoyaltyTransaction,
     Reward,
     BirthdayGift,
+    StoredFile,
 ]
 
 __all__ = [
     "AdminUser",
     "BirthdayGift",
     "Reward",
+    "StoredFile",
     "Category",
     "Customer",
     "DiningTable",

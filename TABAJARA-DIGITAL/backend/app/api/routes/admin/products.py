@@ -12,9 +12,8 @@ from app.services.catalog_service import (
     delete_uploaded_file,
     next_product_position,
     product_out,
-    uploads_path,
 )
-from app.services.image_service import optimize_to_webp
+from app.services.media_service import save_image
 from app.utils.text import slugify
 
 router = APIRouter(prefix="/products", tags=["Admin · Produtos"])
@@ -114,7 +113,7 @@ async def patch_product(product_id: str, data: ProductPatch) -> ProductOut:
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(product_id: str) -> Response:
     product = await get_or_404(Product, product_id, NOT_FOUND)
-    delete_uploaded_file(product.image_url)
+    await delete_uploaded_file(product.image_url)
     await product.delete()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -135,11 +134,11 @@ async def upload_image(product_id: str, file: UploadFile = File(...)) -> Product
     # Nome novo a cada envio: o navegador do cliente nunca mostra a foto antiga em cache.
     filename = f"{product.slug}-{secrets.token_hex(4)}.webp"
     try:
-        optimize_to_webp(data, uploads_path("produtos", filename))
+        await save_image(data, "produtos", filename)
     except (UnidentifiedImageError, OSError):
         raise HTTPException(status_code=422, detail="Não foi possível ler a imagem. Tente outro arquivo.") from None
 
-    delete_uploaded_file(product.image_url)
+    await delete_uploaded_file(product.image_url)
     product.image_url = f"/uploads/produtos/{filename}"
     await product.save()
     return product_out(product)
@@ -148,7 +147,7 @@ async def upload_image(product_id: str, file: UploadFile = File(...)) -> Product
 @router.delete("/{product_id}/image", response_model=ProductOut)
 async def remove_image(product_id: str) -> ProductOut:
     product = await get_or_404(Product, product_id, NOT_FOUND)
-    delete_uploaded_file(product.image_url)
+    await delete_uploaded_file(product.image_url)
     product.image_url = None
     await product.save()
     return product_out(product)

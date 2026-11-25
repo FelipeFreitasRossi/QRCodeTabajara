@@ -14,6 +14,7 @@ from pathlib import Path
 
 from app.core.config import settings
 from app.db.mongodb import connect_to_mongo
+from app.services import media_service
 from app.models import Category, DiningTable, Product
 from app.services.image_service import optimize_to_webp
 from app.utils.text import slugify
@@ -111,6 +112,8 @@ async def main() -> None:
         print(f"  Mesas: 1 a {TABLE_COUNT}")
         seed_hero()
         await seed_menu()
+        sent = await media_service.sync_folder()
+        print(f"  Fotos copiadas para o banco: {sent}")
         print("Pronto.")
     finally:
         await client.close()

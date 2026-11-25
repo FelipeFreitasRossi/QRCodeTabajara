@@ -3,16 +3,18 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+import asyncio
+
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
 
 from app.api.router import api_router
 from app.core.config import settings
 from app.db.mongodb import connect_to_mongo
+from app.services import keep_alive, media_service
 
 logger = logging.getLogger("tabajara")
 
@@ -26,7 +28,14 @@ async def lifespan(app: FastAPI):
     if problems and settings.is_production:
         raise RuntimeError("Configuração insegura para produção: " + " | ".join(problems))
     app.state.mongo = await connect_to_mongo()
+    robot = keep_alive.start()  # só liga na hospedagem (Render) ou com KEEP_ALIVE_URL
     yield
+    if robot:
+        robot.cancel()
+        try:
+            await robot
+        except asyncio.CancelledError:
+            pass
     await app.state.mongo.close()
 
 
@@ -131,4 +140,14 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 app.include_router(api_router)
 
 settings.uploads_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=settings.uploads_dir), name="uploads")
+
+
+@app.api_route("/uploads/{path:path}", methods=["GET", "HEAD"], include_in_schema=False)
+async def uploaded_file(path: str) -> FileResponse:
+    """Fotos enviadas. Usa o disco; se o arquivo sumiu (hospedagem reiniciou), recria a partir do banco."""
+    relative = media_service.safe_relative(path)
+    full = await media_service.restore(relative) if relative else None
+    if full is None:
+        raise HTTPException(status_code=404, detail="Arquivo não encontrado.")
+    # O nome muda a cada envio, então o navegador pode guardar a foto por bastante tempo.
+    return FileResponse(full, headers={"Cache-Control": "public, max-age=604800"})

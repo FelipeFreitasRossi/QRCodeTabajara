@@ -58,3 +58,19 @@ def test_sessoes_antigas_sao_invalidadas():
     assert issued_before(old, now)
     assert not issued_before(TokenData("abc", now + timedelta(seconds=1)), now)
     assert not issued_before(old, None)
+
+
+def test_robo_liga_so_na_hospedagem():
+    base = dict(mongodb_url="mongodb://x", jwt_secret="y" * 40, _env_file=None)
+    assert Settings(**base).keep_alive_target is None  # no computador: desligado
+    on_render = Settings(**base, render_external_url="https://tabajara-api.onrender.com/")
+    assert on_render.keep_alive_target == "https://tabajara-api.onrender.com/api/health"
+    assert Settings(**base, render_external_url="https://a.onrender.com", keep_alive_url="off").keep_alive_target is None
+
+
+def test_caminho_de_foto_nao_sai_da_pasta_uploads():
+    from app.services.media_service import safe_relative
+
+    assert safe_relative("produtos/picanha-1a2b.webp") == "produtos/picanha-1a2b.webp"
+    for bad in ["../.env", "/etc/passwd", "produtos/../../x", ".gitkeep", "a\\b", "produtos/.tmp-1", ""]:
+        assert safe_relative(bad) is None

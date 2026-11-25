@@ -4,7 +4,8 @@ Seguro para rodar mais de uma vez. NÃO apaga nem altera dados existentes:
 - só preenche o código do QR nas mesas que ainda não têm;
 - cria os índices novos (clientes, pontos);
 - cria as regras padrão do Clube se ainda não existirem;
-- coloca a foto de exemplo nas seções que ainda não têm foto (não troca foto existente).
+- coloca a foto de exemplo nas seções que ainda não têm foto (não troca foto existente);
+- copia as fotos da pasta uploads/ para o banco (só as que ainda não estão lá).
 
 Uso:  python -m scripts.migrate
 """
@@ -14,7 +15,7 @@ import secrets
 
 from app.db.mongodb import connect_to_mongo
 from app.models import Category, DiningTable
-from app.services import loyalty_service
+from app.services import loyalty_service, media_service
 from scripts.seed import category_photo
 
 
@@ -33,6 +34,7 @@ async def main() -> None:
                 await category.save()
                 photos += 1
         print(f"Seções que ganharam foto: {photos}")
+        print(f"Fotos copiadas para o banco (proteção contra disco apagado na hospedagem): {await media_service.sync_folder()}")
         settings = await loyalty_service.get_settings()
         print(f"Clube Tabajara: {'ativo' if settings.enabled else 'desligado'} · {settings.points_per_real} ponto(s) por real")
         print("Pronto. Nenhum dado existente foi apagado.")

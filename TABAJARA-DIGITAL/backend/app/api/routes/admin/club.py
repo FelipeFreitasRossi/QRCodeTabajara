@@ -22,8 +22,8 @@ from app.schemas.club import (
 )
 from app.schemas.customer import AdminPinResetIn, BirthdayIn
 from app.services import loyalty_service, reward_service
-from app.services.catalog_service import delete_uploaded_file, uploads_path
-from app.services.image_service import optimize_to_webp
+from app.services.catalog_service import delete_uploaded_file
+from app.services.media_service import save_image
 from app.utils.cpf import cpf_hash, is_valid_cpf, only_digits
 
 router = APIRouter(prefix="/club", tags=["Admin · Clube"])
@@ -221,7 +221,7 @@ async def update_reward(reward_id: str, data: RewardIn) -> RewardAdminOut:
 async def delete_reward(reward_id: str) -> Response:
     """Remove do catálogo. Pedidos antigos continuam com o nome do resgate."""
     reward = await get_or_404(Reward, reward_id, REWARD_NOT_FOUND)
-    delete_uploaded_file(reward.image_url)
+    await delete_uploaded_file(reward.image_url)
     await reward.delete()
     return Response(status_code=204)
 
@@ -238,10 +238,10 @@ async def upload_reward_image(reward_id: str, file: UploadFile = File(...)) -> R
         raise HTTPException(status_code=413, detail=f"A imagem deve ter no máximo {app_settings.max_upload_mb} MB.")
     filename = f"recompensa-{reward.id}-{secrets.token_hex(4)}.webp"
     try:
-        optimize_to_webp(data, uploads_path("recompensas", filename))
+        await save_image(data, "recompensas", filename)
     except (UnidentifiedImageError, OSError):
         raise HTTPException(status_code=422, detail="Não foi possível ler a imagem. Tente outro arquivo.") from None
-    delete_uploaded_file(reward.image_url)
+    await delete_uploaded_file(reward.image_url)
     reward.image_url = f"/uploads/recompensas/{filename}"
     await reward.save()
     return await _reward_admin_out(reward)
@@ -250,7 +250,7 @@ async def upload_reward_image(reward_id: str, file: UploadFile = File(...)) -> R
 @router.delete("/rewards/{reward_id}/image", response_model=RewardAdminOut)
 async def remove_reward_image(reward_id: str) -> RewardAdminOut:
     reward = await get_or_404(Reward, reward_id, REWARD_NOT_FOUND)
-    delete_uploaded_file(reward.image_url)
+    await delete_uploaded_file(reward.image_url)
     reward.image_url = None
     await reward.save()
     return await _reward_admin_out(reward)

@@ -166,6 +166,45 @@ Antes de colocar no ar (checklist):
 1. `ENVIRONMENT=production`, `JWT_SECRET` e `CPF_HASH_KEY` longos e diferentes (gere com `python -c "import secrets; print(secrets.token_urlsafe(48))"`). Se você já tem clientes e `CPF_HASH_KEY` estava vazio, use nele o valor **atual** do `JWT_SECRET`.
 2. Site e API só em **https**. `PUBLIC_SITE_URL` e `CORS_ORIGINS` com o endereço https do site.
 3. Atrás de proxy/hospedagem: `uvicorn app.main:app --proxy-headers --forwarded-allow-ips="<ip do proxy>"` (para o limite de tentativas ver o IP real).
-4. MongoDB Atlas: usuário só com permissão no banco `tabajara`, lista de IPs liberados só com o servidor, backup ativado.
+4. MongoDB Atlas: usuário só com permissão no banco `tabajara`, senha forte, backup ativado. (No Render gratuito o servidor não tem IP fixo, então a lista de IPs precisa ser `0.0.0.0/0`; a proteção fica na senha do usuário do banco.)
 5. Na hospedagem do site, adicione o cabeçalho `X-Frame-Options: DENY` (impede o site de ser embutido em outra página).
 6. Crie o admin com senha forte (mínimo 10 caracteres) e não compartilhe o login: cada pessoa da equipe com o seu.
+
+
+## Publicar na internet (Render + MongoDB Atlas, gratuito)
+
+O arquivo `render.yaml` cria tudo de uma vez: a **API** (`tabajara-api`) e o **site** (`tabajara-cardapio`).
+
+**Robô "não durma":** o Render gratuito desliga a API depois de 15 minutos sem acessos (e o próximo cliente espera até 1 minuto). A API tem um robô que se acessa a cada 10 minutos (`app/services/keep_alive.py`). Ele liga sozinho no Render e fica desligado no seu computador. Nos logs do Render aparece `Robô: ... respondeu 200`.
+
+**Fotos:** o Render gratuito apaga o disco a cada reinício. Por isso as fotos enviadas também ficam guardadas no MongoDB, e a API recria o arquivo sozinha quando ele some do disco.
+
+### 1. Banco (MongoDB Atlas)
+1. Em cloud.mongodb.com crie um cluster gratuito (M0), de preferência na região São Paulo.
+2. **Database Access**: crie um usuário com senha forte.
+3. **Network Access**: adicione `0.0.0.0/0` (o Render gratuito não tem IP fixo).
+4. **Connect > Drivers**: copie a string `mongodb+srv://usuario:senha@...`.
+
+### 2. Preparar o banco a partir do seu computador
+No `backend/.env`, troque `MONGODB_URL` pela string do Atlas e rode (cmd, com o `.venv` ativo):
+```
+python -m scripts.seed          (banco novo: cardápio de exemplo + fotos; pule se já tem os dados no Atlas)
+python -m scripts.migrate       (seguro: não apaga nada; cria índices e regras do Clube)
+python -m scripts.sync_uploads  (copia as fotos da pasta uploads/ para o banco)
+python -m scripts.create_admin  (seu login do painel)
+```
+
+### 3. Código no GitHub
+Crie um repositório **privado** e envie a pasta do projeto (o `.gitignore` já impede o envio do `.env` com as senhas).
+
+### 4. Render
+1. render.com > **New > Blueprint** > escolha o repositório.
+2. Ele pede dois valores: `MONGODB_URL` (a string do Atlas) e `CPF_HASH_KEY` (o **mesmo** valor do seu `backend/.env`).
+3. Clique em **Apply** e espere os dois serviços ficarem "Live" (a primeira vez leva alguns minutos).
+4. Confira os endereços. Se o site não ficou em `https://tabajara-cardapio.onrender.com`, abra **tabajara-api > Environment**, corrija `PUBLIC_SITE_URL` e `CORS_ORIGINS` e salve (a API reinicia sozinha).
+5. Teste: `https://tabajara-api.onrender.com/api/health` deve mostrar `"status": "ok"`; depois abra o site e entre no `/admin`.
+6. No painel, em **Mesas**, baixe os QR Codes de novo: eles passam a apontar para o endereço público.
+
+Toda vez que você enviar mudanças ao GitHub, o Render publica de novo sozinho.
+
+**Reforço opcional:** crie um monitor gratuito no UptimeRobot (HTTP, a cada 5 min) para `https://tabajara-api.onrender.com/api/health`. Ele também avisa por e-mail se a API cair.

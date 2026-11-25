@@ -13,9 +13,8 @@ from app.services.catalog_service import (
     category_out,
     delete_uploaded_file,
     next_category_position,
-    uploads_path,
 )
-from app.services.image_service import optimize_to_webp
+from app.services.media_service import save_image
 from app.utils.text import slugify
 
 router = APIRouter(prefix="/categories", tags=["Admin · Categorias"])
@@ -87,7 +86,7 @@ async def delete_category(category_id: str) -> Response:
             status_code=status.HTTP_409_CONFLICT,
             detail="Esta categoria tem produtos. Exclua ou mova os produtos antes de excluí-la.",
         )
-    delete_uploaded_file(category.image_url)
+    await delete_uploaded_file(category.image_url)
     await category.delete()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -107,10 +106,10 @@ async def upload_category_image(category_id: str, file: UploadFile = File(...)) 
         raise HTTPException(status_code=413, detail=f"A imagem deve ter no máximo {settings.max_upload_mb} MB.")
     filename = f"{category.slug}-{secrets.token_hex(4)}.webp"
     try:
-        optimize_to_webp(data, uploads_path("categorias", filename), max_size=(1400, 1400))
+        await save_image(data, "categorias", filename, max_size=(1400, 1400))
     except (UnidentifiedImageError, OSError):
         raise HTTPException(status_code=422, detail="Não foi possível ler a imagem. Tente outro arquivo.") from None
-    delete_uploaded_file(category.image_url)
+    await delete_uploaded_file(category.image_url)
     category.image_url = f"/uploads/categorias/{filename}"
     await category.save()
     return await category_out(category)
@@ -119,7 +118,7 @@ async def upload_category_image(category_id: str, file: UploadFile = File(...)) 
 @router.delete("/{category_id}/image", response_model=CategoryOut)
 async def remove_category_image(category_id: str) -> CategoryOut:
     category = await get_or_404(Category, category_id, NOT_FOUND)
-    delete_uploaded_file(category.image_url)
+    await delete_uploaded_file(category.image_url)
     category.image_url = None
     await category.save()
     return await category_out(category)

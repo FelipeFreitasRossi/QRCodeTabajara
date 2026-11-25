@@ -36,11 +36,27 @@ class Settings(BaseSettings):
 
     uploads_dir: Path = BASE_DIR / "uploads"
 
+    # "Robô" que acessa a própria API de tempos em tempos para a hospedagem gratuita não pôr o servidor
+    # para dormir (o Render desliga após 15 min sem acessos). Vazio: usa RENDER_EXTERNAL_URL, se existir.
+    keep_alive_url: str = ""
+    keep_alive_minutes: int = 10
+    render_external_url: str = ""  # o Render preenche sozinho
+
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+    @property
+    def keep_alive_target(self) -> str | None:
+        """Endereço que o robô acessa, ou None se o robô estiver desligado."""
+        url = self.keep_alive_url.strip()
+        if url.lower() in {"off", "0", "false", "nao", "não"}:
+            return None
+        if not url and self.render_external_url.strip():
+            url = self.render_external_url.strip().rstrip("/") + "/api/health"
+        return url or None
 
     @property
     def is_production(self) -> bool:
