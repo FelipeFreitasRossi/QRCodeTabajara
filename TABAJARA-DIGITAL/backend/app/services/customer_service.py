@@ -5,10 +5,20 @@ from datetime import timedelta
 from fastapi import HTTPException, status
 from pymongo.errors import DuplicateKeyError
 
-from app.core.security import create_customer_token, hash_password, verify_password
+from app.core.security import (
+    burn_password_time,
+    create_customer_token,
+    hash_password,
+    verify_password,
+)
 from app.models import Customer
 from app.models.base import utc_now
-from app.schemas.customer import PRIVACY_VERSION, CustomerOut, CustomerRegisterIn, CustomerSessionOut
+from app.schemas.customer import (
+    PRIVACY_VERSION,
+    CustomerOut,
+    CustomerRegisterIn,
+    CustomerSessionOut,
+)
 from app.services import loyalty_service
 from app.utils.cpf import cpf_hash, cpf_tail, is_valid_cpf
 
@@ -75,7 +85,7 @@ async def authenticate(cpf: str, pin: str) -> Customer:
 
     customer = await Customer.find_one({"cpf_hash": cpf_hash(cpf), "active": True})
     if customer is None:
-        hash_password(pin)  # mesmo tempo de resposta de um CPF existente
+        burn_password_time(pin)  # mesmo tempo de resposta de um CPF existente
         raise invalid
 
     now = utc_now()

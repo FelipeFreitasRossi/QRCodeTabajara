@@ -9,25 +9,12 @@ import type { Customer } from '../../types/club'
 import { cx } from '../../utils/dom'
 import { isValidCpf, maskCpf, maskPhone, onlyDigits } from '../../utils/format'
 import { Button } from '../ui/Button'
-import { Field, Input, Select } from '../ui/FormControls'
+import { Field, Input } from '../ui/FormControls'
+import { BirthdayPicker } from './BirthdayPicker'
 import styles from './ClubAuthForm.module.css'
 
 export type AuthMode = 'login' | 'register'
 
-const MONTHS = [
-  'janeiro',
-  'fevereiro',
-  'março',
-  'abril',
-  'maio',
-  'junho',
-  'julho',
-  'agosto',
-  'setembro',
-  'outubro',
-  'novembro',
-  'dezembro',
-]
 
 interface ClubAuthFormProps {
   mode: AuthMode
@@ -53,8 +40,8 @@ export function ClubAuthForm({ mode, onModeChange, onSuccess, initialName = '', 
   const [showPin, setShowPin] = useState(false)
   const [privacy, setPrivacy] = useState(false)
   const [remember, setRemember] = useState(false)
-  const [birthDay, setBirthDay] = useState('')
-  const [birthMonth, setBirthMonth] = useState('')
+  const [birthDay, setBirthDay] = useState<number | null>(null)
+  const [birthMonth, setBirthMonth] = useState<number | null>(null)
   const [errors, setErrors] = useState<Errors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -74,7 +61,7 @@ export function ClubAuthForm({ mode, onModeChange, onSuccess, initialName = '', 
       if (/^\d{4,6}$/.test(pin) && (/^(\d)\1+$/.test(pin) || '0123456789'.includes(pin) || '9876543210'.includes(pin)))
         next.pin = 'Escolha um PIN menos óbvio (evite 1234, 0000…).'
       if (pin2 !== pin) next.pin2 = 'Os PINs não são iguais.'
-      if (Boolean(birthDay) !== Boolean(birthMonth)) next.birth = 'Escolha o dia e o mês (ou deixe os dois em branco).'
+      if (birthDay === null || birthMonth === null) next.birth = 'Informe o dia e o mês do seu aniversário.'
       if (!privacy) next.privacy = 'Para participar, aceite o aviso de privacidade.'
     }
     setErrors(next)
@@ -99,8 +86,8 @@ export function ClubAuthForm({ mode, onModeChange, onSuccess, initialName = '', 
               pin,
               accept_privacy: true,
               remember,
-              birth_day: birthDay ? Number(birthDay) : null,
-              birth_month: birthMonth ? Number(birthMonth) : null,
+              birth_day: birthDay as number,
+              birth_month: birthMonth as number,
             })
       onSuccess(customer, mode)
     } catch (error) {
@@ -271,44 +258,22 @@ export function ClubAuthForm({ mode, onModeChange, onSuccess, initialName = '', 
 
         {mode === 'register' && (
           <Field
-            label="Aniversário (opcional)"
-            htmlFor={id('aniv-dia')}
+            label="Aniversário"
+            htmlFor={id('aniv')}
             error={errors.birth}
-            hint="Ganhe um presente no mês do seu aniversário."
+            hint="Só dia e mês. No mês do seu aniversário você ganha um presente."
           >
-            <div className={styles.birth}>
-              <Select
-                id={id('aniv-dia')}
-                aria-label="Dia do aniversário"
-                value={birthDay}
-                onChange={(e) => {
-                  setBirthDay(e.target.value)
-                  clear('birth')
-                }}
-              >
-                <option value="">Dia</option>
-                {Array.from({ length: 31 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {String(i + 1).padStart(2, '0')}
-                  </option>
-                ))}
-              </Select>
-              <Select
-                aria-label="Mês do aniversário"
-                value={birthMonth}
-                onChange={(e) => {
-                  setBirthMonth(e.target.value)
-                  clear('birth')
-                }}
-              >
-                <option value="">Mês</option>
-                {MONTHS.map((m, i) => (
-                  <option key={m} value={i + 1}>
-                    {m}
-                  </option>
-                ))}
-              </Select>
-            </div>
+            <BirthdayPicker
+              id={id('aniv')}
+              day={birthDay}
+              month={birthMonth}
+              invalid={Boolean(errors.birth)}
+              onChange={(d, m) => {
+                setBirthDay(d)
+                setBirthMonth(m)
+                clear('birth')
+              }}
+            />
           </Field>
         )}
 

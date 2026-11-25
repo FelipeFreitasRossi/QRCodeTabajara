@@ -14,7 +14,15 @@ from beanie import PydanticObjectId, UpdateResponse
 from fastapi import HTTPException, status
 from pymongo.errors import DuplicateKeyError
 
-from app.models import LoyaltyAccount, LoyaltySettings, LoyaltyTransaction, Order, OrderStatus, Product, TransactionType
+from app.models import (
+    LoyaltyAccount,
+    LoyaltySettings,
+    LoyaltyTransaction,
+    Order,
+    OrderStatus,
+    Product,
+    TransactionType,
+)
 from app.models.order import ACTIVE_STATUSES
 
 

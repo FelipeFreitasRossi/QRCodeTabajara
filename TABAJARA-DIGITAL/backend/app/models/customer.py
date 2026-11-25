@@ -34,6 +34,8 @@ class Customer(TimestampedDocument):
     birth_month: int | None = None
     birth_year: int | None = None
     birthday_set_at: datetime | None = None
+    # Sessões emitidas antes disso deixam de valer (PIN redefinido, exclusão de dados).
+    tokens_valid_after: datetime | None = None
     favorite_product_ids: list[PydanticObjectId] = Field(default_factory=list)
 
     class Settings:

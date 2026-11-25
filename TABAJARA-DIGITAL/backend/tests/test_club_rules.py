@@ -43,3 +43,34 @@ def test_pontos_respeitam_pedido_minimo_e_clube_desligado():
     assert points_for(4000, _settings(min_order_cents=5000)) == 0
     assert points_for(5000, _settings(min_order_cents=5000)) == 50
     assert points_for(50000, _settings(enabled=False)) == 0
+
+
+def _register_payload(**kw):
+    base = dict(
+        name="Marina",
+        cpf="529.982.247-25",
+        phone="16999998888",
+        pin="4826",
+        accept_privacy=True,
+        birth_day=14,
+        birth_month=3,
+    )
+    base.update(kw)
+    return base
+
+
+def test_cadastro_exige_aniversario():
+    from pydantic import ValidationError
+
+    from app.schemas.customer import CustomerRegisterIn
+
+    assert CustomerRegisterIn(**_register_payload()).birth_month == 3
+    for missing in ("birth_day", "birth_month"):
+        data = _register_payload()
+        data.pop(missing)
+        with pytest.raises(ValidationError):
+            CustomerRegisterIn(**data)
+    with pytest.raises(ValidationError):
+        CustomerRegisterIn(**_register_payload(birth_day=31, birth_month=4))
+    # 29/02 sem ano é aceito (quem nasceu em ano bissexto)
+    assert CustomerRegisterIn(**_register_payload(birth_day=29, birth_month=2)).birth_day == 29

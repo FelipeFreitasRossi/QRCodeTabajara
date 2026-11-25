@@ -27,8 +27,9 @@ export interface CustomerRegister {
   accept_privacy: true
   /** "Manter conectado neste celular" (o servidor decide quanto tempo). */
   remember?: boolean
-  birth_day?: number | null
-  birth_month?: number | null
+  /** Obrigatórios no cadastro (o ano é opcional). */
+  birth_day: number
+  birth_month: number
   birth_year?: number | null
 }
 

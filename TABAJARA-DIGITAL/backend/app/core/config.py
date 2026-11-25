@@ -43,6 +43,26 @@ class Settings(BaseSettings):
     )
 
     @property
+    def is_production(self) -> bool:
+        return self.environment.strip().lower() in {"production", "producao", "produção", "prod"}
+
+    def security_problems(self) -> list[str]:
+        """Configurações inseguras. Em produção a API não sobe com nenhuma delas."""
+        problems: list[str] = []
+        weak = {"troque-esta-chave", "troque-por-uma-chave-secreta-longa", "change-me", "secret", "changeme"}
+        if len(self.jwt_secret) < 32 or self.jwt_secret.lower() in weak:
+            problems.append("JWT_SECRET fraco: use pelo menos 32 caracteres aleatórios.")
+        if not self.cpf_hash_key or len(self.cpf_hash_key) < 32 or self.cpf_hash_key == "troque-esta-chave-tambem":
+            problems.append("CPF_HASH_KEY ausente ou curto: defina uma chave própria de 32+ caracteres (e nunca a troque).")
+        if "*" in self.cors_list:
+            problems.append("CORS_ORIGINS não pode ser '*': liste só o endereço do site.")
+        if self.is_production and not self.public_site_url.startswith("https://"):
+            problems.append("PUBLIC_SITE_URL precisa usar https:// em produção.")
+        if self.is_production and any(o.startswith("http://") for o in self.cors_list):
+            problems.append("CORS_ORIGINS em produção deve ter só endereços https://.")
+        return problems
+
+    @property
     def cors_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 

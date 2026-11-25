@@ -2,10 +2,10 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from app.models.base import utc_now
 from app.api.deps import get_current_customer, parse_object_id
 from app.core.rate_limit import customer_login_limiter, customer_register_limiter
 from app.models import Customer, Product
+from app.models.base import utc_now
 from app.schemas.customer import (
     BirthdayIn,
     CustomerLoginIn,

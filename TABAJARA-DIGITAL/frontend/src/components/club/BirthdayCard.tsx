@@ -6,29 +6,15 @@ import { useClubCart } from '../../hooks/useClubCart'
 import { errorMessage } from '../../services/api'
 import { setBirthday } from '../../services/clubService'
 import { cx } from '../../utils/dom'
-import { Select } from '../ui/FormControls'
+import { BirthdayPicker, MONTHS } from './BirthdayPicker'
 import styles from './BirthdayCard.module.css'
 
-const MONTHS = [
-  'janeiro',
-  'fevereiro',
-  'março',
-  'abril',
-  'maio',
-  'junho',
-  'julho',
-  'agosto',
-  'setembro',
-  'outubro',
-  'novembro',
-  'dezembro',
-]
 
 /** Presente de aniversário na área do Clube: informar a data (uma vez) e ver se o presente está liberado. */
 export function BirthdayCard({ onUse }: { onUse?: () => void }) {
   const { birthday, refreshBirthday, setBirthdayGift } = useClubCart()
-  const [day, setDay] = useState('')
-  const [month, setMonth] = useState('')
+  const [day, setDay] = useState<number | null>(null)
+  const [month, setMonth] = useState<number | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -38,10 +24,10 @@ export function BirthdayCard({ onUse }: { onUse?: () => void }) {
   const save = async (event: FormEvent) => {
     event.preventDefault()
     setError(null)
-    if (!day || !month) return setError('Escolha o dia e o mês.')
+    if (day === null || month === null) return setError('Escolha o dia e o mês.')
     setBusy(true)
     try {
-      await setBirthday(Number(day), Number(month), null)
+      await setBirthday(day, month, null)
       refreshBirthday()
     } catch (err) {
       setError(errorMessage(err))
@@ -103,22 +89,16 @@ export function BirthdayCard({ onUse }: { onUse?: () => void }) {
               corrigir, fale com a equipe.
             </p>
             <form className={styles.form} onSubmit={save} noValidate>
-              <Select aria-label="Dia" value={day} onChange={(e) => setDay(e.target.value)}>
-                <option value="">Dia</option>
-                {Array.from({ length: 31 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {String(i + 1).padStart(2, '0')}
-                  </option>
-                ))}
-              </Select>
-              <Select aria-label="Mês" value={month} onChange={(e) => setMonth(e.target.value)}>
-                <option value="">Mês</option>
-                {MONTHS.map((m, i) => (
-                  <option key={m} value={i + 1}>
-                    {m}
-                  </option>
-                ))}
-              </Select>
+              <BirthdayPicker
+                day={day}
+                month={month}
+                disabled={busy}
+                onChange={(d, m) => {
+                  setDay(d)
+                  setMonth(m)
+                  setError(null)
+                }}
+              />
               <button type="submit" className={styles.primary} disabled={busy}>
                 {busy ? 'Salvando…' : 'Salvar'}
               </button>

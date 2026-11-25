@@ -11,6 +11,7 @@ import re
 from app.core.security import hash_password
 from app.db.mongodb import connect_to_mongo
 from app.models import AdminUser
+from app.models.base import utc_now
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -24,9 +25,9 @@ def ask(prompt: str) -> str:
 
 def ask_password() -> str:
     while True:
-        password = getpass.getpass("Senha (mínimo 8 caracteres, não aparece ao digitar): ")
-        if len(password) < 8:
-            print("  A senha precisa ter pelo menos 8 caracteres.")
+        password = getpass.getpass("Senha (mínimo 10 caracteres, não aparece ao digitar): ")
+        if len(password) < 10:
+            print("  A senha precisa ter pelo menos 10 caracteres.")
             continue
         if password != getpass.getpass("Repita a senha: "):
             print("  As senhas não conferem. Tente de novo.")
@@ -49,6 +50,9 @@ async def main() -> None:
         if admin:
             admin.name = name
             admin.password_hash = hash_password(password)
+            admin.failed_attempts = 0
+            admin.locked_until = None
+            admin.tokens_valid_after = utc_now()  # derruba sessões abertas com a senha antiga
             admin.active = True
             await admin.save()
             print(f"\nSenha atualizada para {email}.")

@@ -23,6 +23,9 @@ interface SheetProps {
 }
 
 const DRAG_CLOSE_DISTANCE = 110
+
+/** Painéis abertos, do mais antigo ao mais novo: só o de cima responde ao teclado. */
+const openSheets: object[] = []
 const FOCUSABLE = 'button:not([disabled]), [href], input, textarea, [tabindex]:not([tabindex="-1"])'
 
 /**
@@ -43,6 +46,16 @@ export function Sheet({
   const panelRef = useRef<HTMLDivElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
   const drag = useRef({ startY: 0, distance: 0, active: false })
+  const token = useRef({})
+
+  useEffect(() => {
+    const me = token.current
+    openSheets.push(me)
+    return () => {
+      const index = openSheets.lastIndexOf(me)
+      if (index >= 0) openSheets.splice(index, 1)
+    }
+  }, [])
 
   // Foco no botão fechar ao abrir; devolve o foco a quem abriu ao fechar.
   useEffect(() => {
@@ -54,6 +67,8 @@ export function Sheet({
   // Esc fecha; Tab fica preso dentro do painel (acessibilidade).
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      // Com um painel aberto sobre outro (ex.: data de aniversário dentro do cadastro), só o de cima reage.
+      if (openSheets[openSheets.length - 1] !== token.current) return
       if (event.key === 'Escape') {
         event.preventDefault()
         onClose()

@@ -148,3 +148,24 @@ frontend/
 ## Identidade visual
 
 Cores, fontes e espaçamentos ficam em `frontend/src/styles/tokens.css`. Nome, cidade e a foto de capa (opcional) ficam em `frontend/src/config/brand.ts`. O logotipo é provisório (texto): coloque o logo oficial em `frontend/public/logo.svg` e siga o comentário em `src/components/ui/Logo.tsx`.
+
+
+## Segurança
+
+O que o sistema já faz:
+- Senhas do painel e PINs do Clube com **bcrypt**; CPF guardado como hash (HMAC) + só os últimos dígitos.
+- **Bloqueio por conta**: painel após 8 senhas erradas, Clube após 5 PINs errados (15 min). Mesma mensagem e mesmo tempo de resposta para conta inexistente (não dá para descobrir e-mails ou CPFs cadastrados).
+- Tokens separados para painel e cliente, com validade; **trocar a senha do painel ou redefinir o PIN derruba as sessões abertas**.
+- Preços, pontos, resgates, estoque e presente de aniversário sempre calculados e conferidos no **servidor**.
+- Uploads só JPG/PNG/WebP, até 8 MB, recodificados em WebP (remove metadados e conteúdo escondido) e com proteção contra "bombas" de imagem.
+- Cabeçalhos de segurança na API (nosniff, sem iframe, CSP, HSTS em produção), corpo de requisição limitado, CORS só para o endereço do site, documentação `/docs` desligada em produção.
+- No site publicado (`npm run build`): CSP que bloqueia scripts de terceiros e sem sourcemaps.
+- Ao iniciar, a API confere a configuração: em desenvolvimento avisa no terminal; em produção **não sobe** com chave fraca, sem `CPF_HASH_KEY` ou sem https.
+
+Antes de colocar no ar (checklist):
+1. `ENVIRONMENT=production`, `JWT_SECRET` e `CPF_HASH_KEY` longos e diferentes (gere com `python -c "import secrets; print(secrets.token_urlsafe(48))"`). Se você já tem clientes e `CPF_HASH_KEY` estava vazio, use nele o valor **atual** do `JWT_SECRET`.
+2. Site e API só em **https**. `PUBLIC_SITE_URL` e `CORS_ORIGINS` com o endereço https do site.
+3. Atrás de proxy/hospedagem: `uvicorn app.main:app --proxy-headers --forwarded-allow-ips="<ip do proxy>"` (para o limite de tentativas ver o IP real).
+4. MongoDB Atlas: usuário só com permissão no banco `tabajara`, lista de IPs liberados só com o servidor, backup ativado.
+5. Na hospedagem do site, adicione o cabeçalho `X-Frame-Options: DENY` (impede o site de ser embutido em outra página).
+6. Crie o admin com senha forte (mínimo 10 caracteres) e não compartilhe o login: cada pessoa da equipe com o seu.

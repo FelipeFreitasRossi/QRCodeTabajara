@@ -122,6 +122,7 @@ async def reset_pin(customer_id: str, data: AdminPinResetIn) -> AdminCustomerOut
     customer.pin_hash = hash_password(data.pin)
     customer.failed_attempts = 0
     customer.locked_until = None
+    customer.tokens_valid_after = utc_now()  # quem estava logado com o PIN antigo precisa entrar de novo
     await customer.save()
     return await _customer_out(customer)
 
@@ -144,6 +145,7 @@ async def anonymize_customer(customer_id: str) -> Response:
         customer.pin_hash = hash_password(secrets.token_urlsafe(24))
         customer.active = False
         customer.anonymized_at = utc_now()
+        customer.tokens_valid_after = utc_now()
         await customer.save()
     return Response(status_code=204)
 

@@ -1,5 +1,7 @@
 """Usuário do painel administrativo. Crie com: python -m scripts.create_admin"""
 
+from datetime import datetime
+
 from pymongo import ASCENDING, IndexModel
 
 from app.models.base import TimestampedDocument
@@ -11,6 +13,10 @@ class AdminUser(TimestampedDocument):
     password_hash: str
     role: str = "admin"  # preparado para outros perfis no futuro (ex.: "cozinha")
     active: bool = True
+    # Bloqueio após erros de senha e invalidação de sessões ao trocar a senha.
+    failed_attempts: int = 0
+    locked_until: datetime | None = None
+    tokens_valid_after: datetime | None = None
 
     class Settings:
         name = "admin_users"

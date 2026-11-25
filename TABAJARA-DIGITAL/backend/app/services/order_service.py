@@ -2,8 +2,8 @@
 
 import secrets
 
-from bson.errors import InvalidId
 from beanie import PydanticObjectId
+from bson.errors import InvalidId
 from fastapi import HTTPException, status
 
 from app.models import Customer, DiningTable, Order, OrderItem, Product

@@ -40,8 +40,9 @@ class CustomerRegisterIn(StrictModel):
     pin: str
     accept_privacy: Literal[True]  # o cadastro só existe com o aceite do aviso de privacidade
     remember: bool = False  # "Manter conectado neste celular"
-    birth_day: int | None = Field(default=None, ge=1, le=31)
-    birth_month: int | None = Field(default=None, ge=1, le=12)
+    # Aniversário obrigatório no cadastro (dia e mês; o ano é opcional).
+    birth_day: int = Field(ge=1, le=31)
+    birth_month: int = Field(ge=1, le=12)
     birth_year: int | None = Field(default=None, ge=1900, le=2100)
 
     @model_validator(mode="after")

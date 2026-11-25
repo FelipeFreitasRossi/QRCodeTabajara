@@ -7,7 +7,7 @@ from bson.errors import InvalidId
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.core.security import decode_access_token, decode_customer_token
+from app.core.security import decode_access_token, decode_customer_token, issued_before
 from app.models import AdminUser, Customer
 
 bearer = HTTPBearer(auto_error=False)
@@ -41,14 +41,14 @@ async def get_current_admin(
     """Protege as rotas do painel: exige um token válido de um administrador ativo."""
     if credentials is None or credentials.scheme.lower() != "bearer":
         raise UNAUTHORIZED
-    admin_id = decode_access_token(credentials.credentials)
-    if admin_id is None:
+    data = decode_access_token(credentials.credentials)
+    if data is None:
         raise UNAUTHORIZED
     try:
-        admin = await AdminUser.get(PydanticObjectId(admin_id))
+        admin = await AdminUser.get(PydanticObjectId(data.subject))
     except (InvalidId, ValueError):
         raise UNAUTHORIZED from None
-    if admin is None or not admin.active:
+    if admin is None or not admin.active or issued_before(data, admin.tokens_valid_after):
         raise UNAUTHORIZED
     return admin
 
@@ -63,14 +63,16 @@ CUSTOMER_UNAUTHORIZED = HTTPException(
 async def _customer_from(credentials: HTTPAuthorizationCredentials | None) -> Customer | None:
     if credentials is None or credentials.scheme.lower() != "bearer":
         return None
-    customer_id = decode_customer_token(credentials.credentials)
-    if customer_id is None:
+    data = decode_customer_token(credentials.credentials)
+    if data is None:
         return None
     try:
-        customer = await Customer.get(PydanticObjectId(customer_id))
+        customer = await Customer.get(PydanticObjectId(data.subject))
     except (InvalidId, ValueError):
         return None
-    return customer if customer and customer.active else None
+    if customer is None or not customer.active or issued_before(data, customer.tokens_valid_after):
+        return None
+    return customer
 
 
 async def get_current_customer(

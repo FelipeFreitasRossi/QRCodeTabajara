@@ -1,7 +1,12 @@
 from app.models.admin_user import AdminUser
 from app.models.category import Category
 from app.models.customer import Customer
-from app.models.loyalty import LoyaltyAccount, LoyaltySettings, LoyaltyTransaction, TransactionType
+from app.models.loyalty import (
+    LoyaltyAccount,
+    LoyaltySettings,
+    LoyaltyTransaction,
+    TransactionType,
+)
 from app.models.order import Order, OrderItem, OrderStatus
 from app.models.product import Product
 from app.models.reward import BirthdayGift, Reward

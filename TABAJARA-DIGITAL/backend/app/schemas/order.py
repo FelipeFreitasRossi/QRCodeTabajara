@@ -9,12 +9,12 @@ from app.schemas.common import StrictModel
 
 
 class OrderItemIn(StrictModel):
-    product_id: str
+    product_id: str = Field(max_length=24)
     quantity: int = Field(ge=1, le=20)
 
 
 class RewardItemIn(StrictModel):
-    reward_id: str
+    reward_id: str = Field(max_length=24)
     quantity: int = Field(default=1, ge=1, le=5)
 
 
