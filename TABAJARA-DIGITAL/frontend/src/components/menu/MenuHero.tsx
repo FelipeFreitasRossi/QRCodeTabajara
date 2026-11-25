@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 
 import { brand } from '../../config/brand'
+import { resolveAssetUrl } from '../../services/api'
 import { useScrollFrame } from '../../hooks/useScrollFrame'
 import { cx } from '../../utils/dom'
 import { Logo } from '../ui/Logo'
@@ -14,15 +15,13 @@ interface MenuHeroProps {
 
 const SPARKS = Array.from({ length: 12 }, (_, i) => i)
 
-/**
- * Capa do cardápio. Fundo com brilho de brasa e fagulhas subindo (ou foto, se
- * configurada em config/brand.ts). Ao rolar, o conteúdo sobe e esmaece (parallax).
- */
 export function MenuHero({ onExplore }: MenuHeroProps) {
   const heroRef = useRef<HTMLElement>(null)
   const [photoReady, setPhotoReady] = useState(false)
   const [photoFailed, setPhotoFailed] = useState(false)
-  const showPhoto = Boolean(brand.heroImage) && !photoFailed
+  // /uploads/... fica na API: em produção ela está em outro endereço que o site.
+  const heroUrl = resolveAssetUrl(brand.heroImage)
+  const showPhoto = Boolean(heroUrl) && !photoFailed
 
   useScrollFrame((scrollY) => {
     const hero = heroRef.current
@@ -34,9 +33,9 @@ export function MenuHero({ onExplore }: MenuHeroProps) {
   return (
     <section id="topo" ref={heroRef} className={styles.hero} aria-labelledby="hero-title">
       <div className={styles.backdrop} aria-hidden="true">
-        {showPhoto && brand.heroImage && (
+        {showPhoto && heroUrl && (
           <img
-            src={brand.heroImage}
+            src={heroUrl}
             alt=""
             className={cx(styles.photo, photoReady && styles.photoReady)}
             onLoad={() => setPhotoReady(true)}
