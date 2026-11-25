@@ -1,0 +1,70 @@
+# Publicação no Render (plano gratuito): API (FastAPI) + site (React).
+# Fica na RAIZ do repositório (ao lado de LICENSE); o código está em TABAJARA-DIGITAL/.
+# No Render: New > Blueprint > escolha este repositório. Ele pede só os valores marcados "sync: false".
+# Passo a passo completo no README, seção "Publicar na internet".
+
+services:
+  # ---------- API ----------
+  - type: web
+    name: tabajara-api
+    runtime: python
+    plan: free
+    rootDir: TABAJARA-DIGITAL/backend
+    buildCommand: pip install -r requirements.txt
+    # --proxy-headers: o Render fica na frente da API; assim o limite de tentativas vê o IP real do cliente.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: ENVIRONMENT
+        value: production
+      - key: MONGODB_URL # string de conexão do MongoDB Atlas (mongodb+srv://...)
+        sync: false
+      - key: MONGODB_DB
+        value: tabajara
+      - key: JWT_SECRET # gerada pelo Render (todos entram de novo, o que é esperado)
+        generateValue: true
+      - key: CPF_HASH_KEY # cole o MESMO valor do seu backend/.env (senão os clientes do Clube não são encontrados)
+        sync: false
+      # Endereço do site. Se o Render der outro nome ao site (ex.: tabajara-cardapio-x1y2), corrija aqui.
+      - key: PUBLIC_SITE_URL
+        value: https://tabajara-cardapio.onrender.com
+      - key: CORS_ORIGINS
+        value: https://tabajara-cardapio.onrender.com
+      # Robô "não durma": acessa /api/health a cada 10 min (o Render desliga após 15 min sem acessos).
+      # Usa o endereço da própria API automaticamente. Para desligar: KEEP_ALIVE_URL=off
+      - key: KEEP_ALIVE_MINUTES
+        value: "10"
+
+  # ---------- Site (cardápio + painel) ----------
+  - type: web
+    name: tabajara-cardapio
+    runtime: static
+    rootDir: TABAJARA-DIGITAL/frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL # endereço público da API, preenchido pelo Render
+        fromService:
+          type: web
+          name: tabajara-api
+          envVarKey: RENDER_EXTERNAL_URL
+    routes:
+      # Aplicativo de página única: /cardapio, /clube, /admin... abrem o index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), geolocation=(), payment=()
