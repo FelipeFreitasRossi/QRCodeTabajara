@@ -27,11 +27,11 @@ services:
         generateValue: true
       - key: CPF_HASH_KEY # cole o MESMO valor do seu backend/.env (senão os clientes do Clube não são encontrados)
         sync: false
-      # Endereço do site. Se o Render der outro nome ao site (ex.: tabajara-cardapio-x1y2), corrija aqui.
+      # Endereço público do site (vai nos QR Codes e é o único site que a API aceita).
       - key: PUBLIC_SITE_URL
-        value: https://tabajara-cardapio.onrender.com
+        value: https://tabajaracardapio.onrender.com
       - key: CORS_ORIGINS
-        value: https://tabajara-cardapio.onrender.com
+        value: https://tabajaracardapio.onrender.com
       # Robô "não durma": acessa /api/health a cada 10 min (o Render desliga após 15 min sem acessos).
       # Usa o endereço da própria API automaticamente. Para desligar: KEEP_ALIVE_URL=off
       - key: KEEP_ALIVE_MINUTES
@@ -39,7 +39,7 @@ services:
 
   # ---------- Site (cardápio + painel) ----------
   - type: web
-    name: tabajara-cardapio
+    name: tabajaracardapio
     runtime: static
     rootDir: TABAJARA-DIGITAL/frontend
     buildCommand: npm install && npm run build
