@@ -24,6 +24,11 @@ class Settings(BaseSettings):
 
     # Endereço público do site (usado nos QR Codes das mesas).
     public_site_url: str = "http://localhost:5173"
+    # Site separado do QR "Chamar atendente" (pasta frontend-chamar). Vazio: usa o PUBLIC_SITE_URL.
+    call_site_url: str = ""
+    # Chamar atendente sem o QR, com o cliente escolhendo a mesa. Vazio: liberado só em desenvolvimento.
+    # No site publicado, ligar (true) deixa qualquer pessoa, mesmo fora do restaurante, escolher uma mesa e chamar.
+    call_by_number: bool | None = None
 
     # Sessão do cliente do Clube Tabajara.
     customer_token_days: int = 30  # com "Manter conectado neste celular"
@@ -59,6 +64,10 @@ class Settings(BaseSettings):
         return url or None
 
     @property
+    def allow_call_by_number(self) -> bool:
+        return self.call_by_number if self.call_by_number is not None else not self.is_production
+
+    @property
     def is_production(self) -> bool:
         return self.environment.strip().lower() in {"production", "producao", "produção", "prod"}
 
@@ -74,6 +83,8 @@ class Settings(BaseSettings):
             problems.append("CORS_ORIGINS não pode ser '*': liste só o endereço do site.")
         if self.is_production and not self.public_site_url.startswith("https://"):
             problems.append("PUBLIC_SITE_URL precisa usar https:// em produção.")
+        if self.is_production and self.call_site_url and not self.call_site_url.startswith("https://"):
+            problems.append("CALL_SITE_URL precisa usar https:// em produção.")
         if self.is_production and any(o.startswith("http://") for o in self.cors_list):
             problems.append("CORS_ORIGINS em produção deve ter só endereços https://.")
         return problems

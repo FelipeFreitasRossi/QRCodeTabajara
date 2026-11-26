@@ -1,0 +1,706 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 22px) var(--page-pad) calc(var(--safe-bottom) + 20px);
+  background: radial-gradient(90% 45% at 50% 0%, rgba(198, 161, 91, 0.12), transparent 70%);
+}
+
+.loading {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 28px;
+  min-height: 100svh;
+  padding: 24px;
+}
+
+.loadingText {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+}
+
+.spin {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- topo: logo e mesa ---------- */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 34px;
+  animation: rise 600ms var(--ease-out) both;
+}
+
+.table {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  column-gap: 8px;
+  padding: 8px 16px 9px;
+  border-radius: 16px;
+  background: var(--c-gold-soft);
+  box-shadow: inset 0 0 0 1px var(--c-gold-line);
+}
+
+.tableWord {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+}
+
+.tableNumber {
+  font-family: var(--font-num, inherit);
+  font-size: 1.75rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--c-gold-bright);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.tableLabel {
+  grid-column: 1 / -1;
+  font-size: var(--fs-xs);
+  color: var(--c-text-soft);
+}
+
+/* ---------- textos ---------- */
+.title {
+  font-size: clamp(2rem, 8vw, 2.5rem);
+  line-height: 1.05;
+}
+
+.text {
+  margin-top: 10px;
+  color: var(--c-text-soft);
+  line-height: 1.5;
+}
+
+.idle,
+.waiting,
+.done {
+  flex: 1;
+  animation: rise 600ms var(--ease-out) 80ms both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* ---------- opções ---------- */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 84px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: var(--c-surface);
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+  color: var(--c-text);
+  text-align: left;
+  transition:
+    transform 220ms var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    background var(--dur-fast) var(--ease-out),
+    opacity var(--dur) var(--ease-out);
+  animation: rise 520ms var(--ease-out) both;
+}
+
+.option:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 1px var(--c-gold-line);
+}
+
+.option:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--c-gold-bright);
+  outline-offset: 3px;
+}
+
+.option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.optionIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--c-gold-soft);
+  box-shadow: inset 0 0 0 1px var(--c-gold-line);
+  color: var(--c-gold-bright);
+}
+
+.optionText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.optionText strong {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.optionText span {
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+
+/* a opção principal ("Chamar atendente") em dourado, maior */
+.optionMain {
+  min-height: 104px;
+  color: #17140e;
+  background: linear-gradient(135deg, var(--c-gold-bright), var(--c-gold));
+  box-shadow: 0 18px 40px -20px rgba(198, 161, 91, 0.95);
+}
+
+.optionMain:hover:not(:disabled) {
+  box-shadow: 0 18px 44px -18px rgba(198, 161, 91, 1);
+}
+
+.optionMain .optionIcon {
+  width: 60px;
+  height: 60px;
+  background: rgba(23, 20, 14, 0.14);
+  box-shadow: none;
+  color: #17140e;
+}
+
+.optionMain .optionText strong {
+  font-size: 1.3125rem;
+}
+
+.optionMain .optionText span {
+  color: rgba(23, 20, 14, 0.72);
+}
+
+.optionsCompact .option {
+  min-height: 64px;
+}
+
+.optionsCompact .optionMain {
+  min-height: 76px;
+}
+
+.optionsCompact .optionIcon {
+  width: 44px;
+  height: 44px;
+}
+
+.cooldown {
+  margin-top: 14px;
+  font-size: var(--fs-sm);
+  text-align: center;
+  color: var(--c-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- aguardando ---------- */
+.waiting,
+.done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 12px;
+}
+
+.bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 132px;
+  height: 132px;
+  margin-bottom: 30px;
+}
+
+.bellIcon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  color: #17140e;
+  background: linear-gradient(135deg, var(--c-gold-bright), var(--c-gold));
+  box-shadow: 0 20px 50px -18px rgba(198, 161, 91, 0.95);
+}
+
+.bellIcon svg {
+  animation: ding 2.4s var(--ease-out) infinite;
+  transform-origin: 50% 10%;
+}
+
+@keyframes ding {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(14deg);
+  }
+  20% {
+    transform: rotate(-12deg);
+  }
+  30% {
+    transform: rotate(8deg);
+  }
+  40% {
+    transform: rotate(-4deg);
+  }
+}
+
+.ring {
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-gold);
+  animation: ripple 2.4s var(--ease-out) infinite;
+}
+
+.ring + .ring {
+  animation-delay: 1.2s;
+}
+
+@keyframes ripple {
+  from {
+    opacity: 0.8;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+.waitActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 34px;
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px var(--c-gold-line);
+  font-weight: 700;
+  color: var(--c-gold-bright);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--c-gold-soft);
+}
+
+.cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  padding: 0 16px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-text-muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.cancel:hover:not(:disabled) {
+  color: var(--c-text);
+}
+
+.secondary:disabled,
+.cancel:disabled {
+  opacity: 0.6;
+}
+
+/* ---------- atendido ---------- */
+.doneIcon {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  margin: 18px 0 30px;
+  border-radius: 50%;
+  color: #17140e;
+  background: linear-gradient(135deg, #b8e0a8, #7fbf6b);
+  box-shadow: 0 20px 50px -20px rgba(127, 191, 107, 0.9);
+  animation: pop 520ms cubic-bezier(0.17, 0.89, 0.32, 1.28);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
+
+.done .options {
+  width: 100%;
+  text-align: left;
+}
+
+/* ---------- avisos e rodapé ---------- */
+.noticeRegion {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--safe-bottom) + 18px);
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--page-pad);
+  pointer-events: none;
+}
+
+.notice {
+  max-width: 440px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(201, 122, 90, 0.5);
+  background: rgba(40, 24, 18, 0.96);
+  font-size: var(--fs-sm);
+  color: #f0c2ad;
+  animation: rise 300ms var(--ease-out);
+}
+
+.footer {
+  margin-top: 36px;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--c-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top,
+  .idle,
+  .waiting,
+  .done,
+  .option,
+  .ring,
+  .bellIcon svg,
+  .doneIcon {
+    animation: none;
+  }
+
+  .ring {
+    display: none;
+  }
+}
+
+/* ================= efeitos ================= */
+
+/* o conteúdo fica acima do fundo vivo */
+.top,
+.idle,
+.waiting,
+.done,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+
+.page {
+  background: transparent;
+}
+
+/* ---------- botões: onda do toque e brilho ---------- */
+.option,
+.secondary {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.optionIcon,
+.optionText {
+  position: relative;
+  z-index: 1;
+}
+
+/* brilho que atravessa o botão principal de tempos em tempos */
+.optionMain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 250, 235, 0.55) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: shine 4.8s ease-in-out 1.4s infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0%,
+  62% {
+    transform: translateX(-120%);
+  }
+  86%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* sino balança ao passar o dedo/mouse; os outros ícones dão um pulinho */
+.option:hover:not(:disabled) .optionIcon svg,
+.option:focus-visible .optionIcon svg {
+  animation: nudge 620ms var(--ease-out);
+}
+
+.optionMain:hover:not(:disabled) .optionIcon svg,
+.optionMain:focus-visible .optionIcon svg {
+  animation: ding 900ms var(--ease-out);
+  transform-origin: 50% 10%;
+}
+
+@keyframes nudge {
+  40% {
+    transform: translateY(-3px) scale(1.08);
+  }
+}
+
+.option:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.option:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* ---------- aguardando: reticências e cronômetro ---------- */
+.dots {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  animation: dot 1.4s ease-in-out infinite;
+}
+
+.dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--c-text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.timer svg {
+  color: var(--c-gold);
+}
+
+/* o sino entra quicando */
+.bellIcon {
+  animation: drop 700ms cubic-bezier(0.17, 0.89, 0.32, 1.28) both;
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-26px) scale(0.6);
+  }
+}
+
+/* ---------- atendido: ✓ desenhado com confetes ---------- */
+.doneWrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 18px 0 30px;
+}
+
+.doneWrap .doneIcon {
+  margin: 0;
+}
+
+/* anel verde que se expande uma vez */
+.doneWrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 2px solid #9fd48c;
+  opacity: 0;
+  animation: halo 900ms var(--ease-out) 200ms;
+}
+
+@keyframes halo {
+  from {
+    opacity: 0.9;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .optionMain::before,
+  .dots i,
+  .bellIcon,
+  .doneWrap::after,
+  .option:hover .optionIcon svg,
+  .optionMain:hover .optionIcon svg {
+    animation: none;
+  }
+
+  .optionMain::before {
+    display: none;
+  }
+
+  .option:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* ---------- mesa escolhida pelo cliente (sem QR) ---------- */
+.tableButton {
+  position: relative;
+  padding-right: 32px;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.tableButton:hover {
+  background: rgba(198, 161, 91, 0.2);
+}
+
+.tableButton:focus-visible {
+  outline: 2px solid var(--c-gold-bright);
+  outline-offset: 3px;
+}
+
+/* ainda sem mesa: borda pulsando de leve para chamar a atenção */
+.tableEmpty {
+  animation: invite 2.4s ease-in-out infinite;
+}
+
+@keyframes invite {
+  50% {
+    box-shadow:
+      inset 0 0 0 1px var(--c-gold),
+      0 0 0 6px rgba(198, 161, 91, 0.12);
+  }
+}
+
+.tableChoose {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-gold-bright);
+  white-space: nowrap;
+}
+
+.tableChevron {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  translate: 0 -50%;
+  color: var(--c-gold);
+}
+
+/* número da mesa acende ao escolher/trocar */
+.tableButton .tableNumber {
+  animation: flash 900ms var(--ease-out);
+}
+
+@keyframes flash {
+  from {
+    color: #fff6dc;
+    text-shadow: 0 0 16px rgba(240, 207, 142, 0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tableEmpty,
+  .tableButton .tableNumber {
+    animation: none;
+  }
+}

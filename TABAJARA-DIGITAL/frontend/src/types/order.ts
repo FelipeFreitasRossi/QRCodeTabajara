@@ -37,6 +37,9 @@ export interface Order {
 export interface AdminOrder extends Order {
   id: string
   customer_id: string | null
+  /** Preenchidos quando o pedido foi cancelado pelo painel. */
+  cancel_reason?: string | null
+  cancelled_by?: string | null
 }
 
 export interface OrderCreate {

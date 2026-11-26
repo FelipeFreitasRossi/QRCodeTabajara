@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { MessageSquare } from 'lucide-react'
+import { Ban, MessageSquare } from 'lucide-react'
 
 import type { AdminOrder, OrderStatus } from '../../types/order'
 import { cx } from '../../utils/dom'
 import { formatTime, timeAgo } from '../../utils/format'
 import { Button } from '../ui/Button'
+import { CancelOrderDialog } from './CancelOrderDialog'
 import { StatusBadge } from './StatusBadge'
 import styles from './OrderCard.module.css'
 import { Money } from '../ui/Money'
@@ -17,12 +18,15 @@ const NEXT: Partial<Record<OrderStatus, { status: OrderStatus; label: string }>>
 
 interface OrderCardProps {
   order: AdminOrder
-  onChangeStatus: (order: AdminOrder, status: OrderStatus) => Promise<void>
+  onChangeStatus: (order: AdminOrder, status: OrderStatus, cancelReason?: string) => Promise<void>
   compact?: boolean
 }
 
 export function OrderCard({ order, onChangeStatus, compact = false }: OrderCardProps) {
   const [busy, setBusy] = useState(false)
+  // Pop-up de cancelamento: montado ao abrir e desmontado depois da animação de saída
+  const [cancelMounted, setCancelMounted] = useState(false)
+  const [cancelOpen, setCancelOpen] = useState(false)
   const [, forceTick] = useState(0)
   const next = NEXT[order.status]
   const isNew = order.status === 'recebido'
@@ -34,14 +38,11 @@ export function OrderCard({ order, onChangeStatus, compact = false }: OrderCardP
   }, [])
 
   const change = async (status: OrderStatus) => {
-    if (
-      status === 'cancelado' &&
-      !window.confirm(`Cancelar o pedido #${order.short_code} da mesa ${order.table_number}?`)
-    )
-      return
     setBusy(true)
     try {
       await onChangeStatus(order, status)
+    } catch {
+      // o painel já mostra o aviso de erro
     } finally {
       setBusy(false)
     }
@@ -94,7 +95,15 @@ export function OrderCard({ order, onChangeStatus, compact = false }: OrderCardP
         </span>
         <div className={styles.actions}>
           {next && order.status !== 'entregue' && (
-            <button type="button" className={styles.cancel} onClick={() => change('cancelado')} disabled={busy}>
+            <button
+              type="button"
+              className={styles.cancel}
+              onClick={() => {
+                setCancelMounted(true)
+                setCancelOpen(true)
+              }}
+              disabled={busy}
+            >
               Cancelar
             </button>
           )}
@@ -105,6 +114,24 @@ export function OrderCard({ order, onChangeStatus, compact = false }: OrderCardP
           )}
         </div>
       </footer>
+
+      {order.status === 'cancelado' && order.cancel_reason && (
+        <p className={styles.cancelReason}>
+          <Ban size={13} aria-hidden="true" />
+          {order.cancel_reason}
+          {order.cancelled_by && <span> · {order.cancelled_by.split(' ')[0]}</span>}
+        </p>
+      )}
+
+      {cancelMounted && (
+        <CancelOrderDialog
+          order={order}
+          open={cancelOpen}
+          onClose={() => setCancelOpen(false)}
+          onExited={() => setCancelMounted(false)}
+          onConfirm={(reason) => onChangeStatus(order, 'cancelado', reason)}
+        />
+      )}
     </article>
   )
 }

@@ -60,6 +60,14 @@ class Order(TimestampedDocument):
     points_spent: int = 0  # pontos trocados por recompensas neste pedido
     redemption_refunded: bool = False  # pedido cancelado: pontos dos resgates devolvidos
     birthday_gift: bool = False
+    # Conta da mesa: preenchido quando o garçom fecha a conta (os próximos clientes da mesa começam do zero).
+    bill_closed_at: datetime | None = None
+    bill_closed_by: str | None = None
+    bill_payment: str | None = None  # forma de pagamento informada ao fechar a conta (opcional)
+    # Cancelamento pelo painel: motivo e quem cancelou (registro para a gerência).
+    cancel_reason: str | None = None
+    cancelled_by: str | None = None
+    cancelled_at: datetime | None = None
 
     class Settings:
         name = "orders"
@@ -67,6 +75,7 @@ class Order(TimestampedDocument):
             IndexModel([("code", ASCENDING)], unique=True, name="uniq_order_code"),
             IndexModel([("status", ASCENDING), ("created_at", DESCENDING)], name="idx_order_status"),
             IndexModel([("created_at", DESCENDING)], name="idx_order_created"),
+            IndexModel([("table_number", ASCENDING), ("created_at", DESCENDING)], name="idx_order_table"),
         ]
 
     @property

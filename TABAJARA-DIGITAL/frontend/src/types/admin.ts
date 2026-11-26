@@ -63,6 +63,8 @@ export interface AdminTable {
   seats: number
   /** Endereço gravado no QR Code da mesa. */
   qr_url: string | null
+  /** Endereço do QR de chamar atendente (página isolada, sem cardápio). */
+  call_url?: string | null
 }
 
 export interface Dashboard {

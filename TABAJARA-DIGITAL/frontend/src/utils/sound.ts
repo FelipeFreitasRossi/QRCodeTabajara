@@ -34,3 +34,21 @@ export function playChime(): void {
     osc.stop(now + offset + 1)
   })
 }
+
+/** Chamado de mesa: três toques rápidos e mais agudos, diferente do aviso de pedido. */
+export function playBell(): void {
+  if (!audio || audio.state !== 'running') return
+  const now = audio.currentTime
+  ;[0, 0.14, 0.28].forEach((offset) => {
+    const osc = audio!.createOscillator()
+    const gain = audio!.createGain()
+    osc.type = 'triangle'
+    osc.frequency.value = 1567.98
+    gain.gain.setValueAtTime(0.0001, now + offset)
+    gain.gain.exponentialRampToValueAtTime(0.3, now + offset + 0.01)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.35)
+    osc.connect(gain).connect(audio!.destination)
+    osc.start(now + offset)
+    osc.stop(now + offset + 0.4)
+  })
+}

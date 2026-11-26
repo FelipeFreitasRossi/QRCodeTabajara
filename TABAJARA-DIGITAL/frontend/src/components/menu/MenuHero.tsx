@@ -15,6 +15,10 @@ interface MenuHeroProps {
 
 const SPARKS = Array.from({ length: 12 }, (_, i) => i)
 
+/**
+ * Capa do cardápio. Fundo com brilho de brasa e fagulhas subindo (ou foto, se
+ * configurada em config/brand.ts). Ao rolar, o conteúdo sobe e esmaece (parallax).
+ */
 export function MenuHero({ onExplore }: MenuHeroProps) {
   const heroRef = useRef<HTMLElement>(null)
   const [photoReady, setPhotoReady] = useState(false)

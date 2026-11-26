@@ -1,4 +1,4 @@
-# Publicação no Render (plano gratuito): API (FastAPI) + site (React).
+# Publicação no Render (plano gratuito): API (FastAPI) + cardápio (React) + site "Chamar atendente" (React).
 # Fica na RAIZ do repositório (ao lado de LICENSE); o código está em TABAJARA-DIGITAL/.
 # No Render: New > Blueprint > escolha este repositório. Ele pede só os valores marcados "sync: false".
 # Passo a passo completo no README, seção "Publicar na internet".
@@ -27,11 +27,13 @@ services:
         generateValue: true
       - key: CPF_HASH_KEY # cole o MESMO valor do seu backend/.env (senão os clientes do Clube não são encontrados)
         sync: false
-      # Endereço público do site (vai nos QR Codes e é o único site que a API aceita).
-      - key: PUBLIC_SITE_URL
-        value: https://tabajaracardapio.onrender.com
-      - key: CORS_ORIGINS
-        value: https://tabajaracardapio.onrender.com
+      # Endereços dos sites. Se o Render der outro nome a um site (ex.: tabajara-chamar-x1y2), corrija aqui.
+      - key: PUBLIC_SITE_URL # cardápio (vai no QR do cardápio)
+        value: https://tabajara-cardapio.onrender.com
+      - key: CALL_SITE_URL # site de chamar atendente (vai no QR de chamar)
+        value: https://tabajara-chamar.onrender.com
+      - key: CORS_ORIGINS # os DOIS sites que podem usar a API, separados por vírgula
+        value: https://tabajara-cardapio.onrender.com,https://tabajara-chamar.onrender.com
       # Robô "não durma": acessa /api/health a cada 10 min (o Render desliga após 15 min sem acessos).
       # Usa o endereço da própria API automaticamente. Para desligar: KEEP_ALIVE_URL=off
       - key: KEEP_ALIVE_MINUTES
@@ -39,7 +41,7 @@ services:
 
   # ---------- Site (cardápio + painel) ----------
   - type: web
-    name: tabajaracardapio
+    name: tabajara-cardapio
     runtime: static
     rootDir: TABAJARA-DIGITAL/frontend
     buildCommand: npm install && npm run build
@@ -65,6 +67,40 @@ services:
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(), microphone=(), geolocation=(), payment=()
+
+  # ---------- Site "Chamar atendente" (QR de chamar de cada mesa) ----------
+  - type: web
+    name: tabajara-chamar
+    runtime: static
+    rootDir: TABAJARA-DIGITAL/frontend-chamar
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL # a MESMA API do cardápio
+        fromService:
+          type: web
+          name: tabajara-api
+          envVarKey: RENDER_EXTERNAL_URL
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: X-Robots-Tag
+        value: noindex
       - path: /*
         name: Permissions-Policy
         value: camera=(), microphone=(), geolocation=(), payment=()

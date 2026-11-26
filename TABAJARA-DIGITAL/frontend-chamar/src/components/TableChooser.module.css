@@ -1,0 +1,246 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.66);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: fade 260ms var(--ease-out);
+}
+
+.panel {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 88svh;
+  overflow-y: auto;
+  padding: 44px var(--page-pad) calc(var(--safe-bottom) + 28px);
+  border-radius: 26px 26px 0 0;
+  background: var(--c-bg-elev);
+  box-shadow:
+    inset 0 1px 0 var(--c-line-strong),
+    0 -30px 60px -30px rgba(0, 0, 0, 0.9);
+  animation: up 420ms var(--ease-out);
+}
+
+@media (min-width: 640px) {
+  .root {
+    align-items: center;
+  }
+
+  .panel {
+    padding: 40px 32px 32px;
+    border-radius: 26px;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes up {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+  color: var(--c-text-soft);
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--c-gold-bright);
+  background: radial-gradient(circle at 30% 30%, rgba(198, 161, 91, 0.3), rgba(198, 161, 91, 0.08));
+  box-shadow: inset 0 0 0 1px var(--c-gold-line);
+}
+
+.title {
+  margin-top: 12px;
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+
+.text {
+  margin-top: 6px;
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+}
+
+.loading,
+.error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+}
+
+.error {
+  color: #f0c2ad;
+}
+
+.spin {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+@media (min-width: 420px) {
+  .grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.table {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+  color: var(--c-text);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform 260ms var(--ease-out);
+  animation: tin 420ms var(--ease-out) backwards;
+}
+
+@keyframes tin {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+  }
+}
+
+.table:hover:not(.picked) {
+  background: rgba(198, 161, 91, 0.08);
+  box-shadow: inset 0 0 0 1px var(--c-gold-line);
+}
+
+.table:active {
+  transform: scale(0.94);
+}
+
+.table:focus-visible {
+  outline: 2px solid var(--c-gold-bright);
+  outline-offset: 2px;
+}
+
+.word {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.number {
+  font-family: var(--font-num, inherit);
+  font-size: 1.625rem;
+  font-weight: 300;
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.area {
+  max-width: 90%;
+  overflow: hidden;
+  font-size: 0.5625rem;
+  color: var(--c-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.check {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--c-gold-bright);
+  background: #17140e;
+  box-shadow: 0 0 0 2px var(--c-gold);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform 300ms var(--ease-out);
+}
+
+.picked {
+  color: #17140e;
+  background: linear-gradient(135deg, var(--c-gold-bright), var(--c-gold));
+  box-shadow: 0 10px 24px -12px rgba(198, 161, 91, 0.95);
+  animation: pop 380ms var(--ease-out);
+}
+
+.picked .word,
+.picked .area {
+  color: rgba(23, 20, 14, 0.7);
+}
+
+.picked .check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@keyframes pop {
+  40% {
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .panel,
+  .table,
+  .picked {
+    animation: none;
+  }
+}

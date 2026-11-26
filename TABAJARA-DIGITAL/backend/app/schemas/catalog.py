@@ -104,3 +104,4 @@ class TableOut(BaseModel):
     active: bool
     seats: int
     qr_url: str | None  # endereço que vai dentro do QR Code
+    call_url: str | None = None  # QR de chamar atendente

@@ -2,6 +2,8 @@
 
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from app.core.config import Settings
 from app.core.security import (
     TokenData,
@@ -74,3 +76,36 @@ def test_caminho_de_foto_nao_sai_da_pasta_uploads():
     assert safe_relative("produtos/picanha-1a2b.webp") == "produtos/picanha-1a2b.webp"
     for bad in ["../.env", "/etc/passwd", "produtos/../../x", ".gitkeep", "a\\b", "produtos/.tmp-1", ""]:
         assert safe_relative(bad) is None
+
+
+def test_chamado_so_aceita_motivos_conhecidos():
+    from pydantic import ValidationError
+
+    from app.schemas.waiter_call import CallCreateIn
+
+    assert CallCreateIn().reason.value == "atendente"
+    assert CallCreateIn(reason="conta").reason.value == "conta"
+    for bad in ({"reason": "pizza"}, {"reason": "conta", "table_number": 5}):
+        with pytest.raises(ValidationError):
+            CallCreateIn(**bad)
+
+
+def test_pedir_a_conta_prevalece_sobre_chamado_simples():
+    from app.models.waiter_call import CallReason
+    from app.services.waiter_call_service import REASON_WEIGHT
+
+    assert REASON_WEIGHT[CallReason.CONTA] > REASON_WEIGHT[CallReason.ATENDENTE] > REASON_WEIGHT[CallReason.AJUDA]
+
+
+def test_qr_de_chamar_aponta_para_o_site_separado():
+    base = dict(mongodb_url="mongodb://x", jwt_secret="y" * 40, _env_file=None)
+    assert Settings(**base).call_site_url == ""
+    s = Settings(**base, environment="production", public_site_url="https://a.com", call_site_url="http://b.com")
+    assert any("CALL_SITE_URL" in p for p in s.security_problems())
+
+
+def test_chamar_pelo_numero_so_em_desenvolvimento():
+    base = dict(mongodb_url="mongodb://x", jwt_secret="y" * 40, _env_file=None)
+    assert Settings(**base).allow_call_by_number is True
+    assert Settings(**base, environment="production").allow_call_by_number is False
+    assert Settings(**base, environment="production", call_by_number=True).allow_call_by_number is True

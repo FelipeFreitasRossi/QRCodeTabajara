@@ -4,7 +4,6 @@ import { Trash2 } from 'lucide-react'
 import { useCart } from '../../hooks/useCart'
 import { MAX_ITEM_QUANTITY } from '../../types/cart'
 import { cx } from '../../utils/dom'
-import { formatPrice } from '../../utils/format'
 import { ProductImage } from '../ui/ProductImage'
 import { QuantityStepper } from '../ui/QuantityStepper'
 import styles from './CartItemList.module.css'
@@ -53,16 +52,20 @@ export function CartItemList({ variant = 'list', onRemove }: CartItemListProps) 
           <div className={styles.info}>
             <div className={styles.topRow}>
               <span className={styles.name}>{product.name}</span>
-              <span key={quantity} className={styles.lineTotal}>
-                <Money cents={product.price_cents * quantity} />
-              </span>
+              <button
+                type="button"
+                className={styles.remove}
+                onClick={() => removeAnimated(product.id)}
+                aria-label={`Remover ${product.name} do carrinho`}
+              >
+                <Trash2 size={16} strokeWidth={1.75} />
+              </button>
             </div>
-            {product.available && quantity > 1 && (
+            {product.available ? (
               <span className={styles.unit}>
-                {quantity} × {formatPrice(product.price_cents)}
+                <Money cents={product.price_cents} variant="plain" /> cada
               </span>
-            )}
-            {!product.available && (
+            ) : (
               <span className={`${styles.unit} ${styles.warning}`}>
                 Indisponível no momento · remova para continuar
               </span>
@@ -76,14 +79,9 @@ export function CartItemList({ variant = 'list', onRemove }: CartItemListProps) 
                 onChange={(value) => setQuantity(product.id, value)}
                 label={product.name}
               />
-              <button
-                type="button"
-                className={styles.remove}
-                onClick={() => removeAnimated(product.id)}
-                aria-label={`Remover ${product.name} do carrinho`}
-              >
-                <Trash2 size={16} strokeWidth={1.75} />
-              </button>
+              <span key={quantity} className={styles.lineTotal}>
+                <Money cents={product.price_cents * quantity} />
+              </span>
             </div>
           </div>
         </li>

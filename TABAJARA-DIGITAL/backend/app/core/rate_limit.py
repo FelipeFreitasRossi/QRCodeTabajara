@@ -28,7 +28,10 @@ class RateLimiter:
     def check(self, request: Request) -> None:
         # Atrás de proxy (Nginx, Render, Railway…), rode o uvicorn com --proxy-headers
         # --forwarded-allow-ips="<ip do proxy>" para este IP ser o do cliente, e não o do proxy.
-        key = request.client.host if request.client else "desconhecido"
+        self.check_key(request.client.host if request.client else "desconhecido")
+
+    def check_key(self, key: str) -> None:
+        """Mesmo limite, contado por uma chave qualquer (ex.: a mesa, e não o IP)."""
         now = time.monotonic()
         self._cleanup(now)
         hits = self._hits[key]
@@ -63,4 +66,17 @@ customer_register_limiter = RateLimiter(
     max_requests=20,
     window_seconds=600,
     message="Muitos cadastros em pouco tempo. Aguarde alguns minutos ou peça ajuda à equipe.",
+)
+
+# Chamar atendente: por IP (folgado, o Wi-Fi é compartilhado) e por mesa (contra brincadeira).
+call_ip_limiter = RateLimiter(
+    max_requests=60,
+    window_seconds=600,
+    message="Muitos chamados em pouco tempo. Aguarde um instante.",
+)
+
+call_table_limiter = RateLimiter(
+    max_requests=8,
+    window_seconds=600,
+    message="Esta mesa já chamou várias vezes. A equipe já foi avisada; aguarde um instante.",
 )

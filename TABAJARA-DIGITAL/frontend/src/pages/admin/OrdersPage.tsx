@@ -28,11 +28,13 @@ export function OrdersPage() {
   const finished = (orders ?? []).filter((o) => o.status === 'entregue' || o.status === 'cancelado')
   const revenue = finished.filter((o) => o.status === 'entregue').reduce((sum, o) => sum + o.total_cents, 0)
 
-  const handleChange = async (order: AdminOrder, status: OrderStatus) => {
+  const handleChange = async (order: AdminOrder, status: OrderStatus, cancelReason?: string) => {
     try {
-      await setOrderStatus(order.id, status)
+      await setOrderStatus(order.id, status, cancelReason)
+      if (status === 'cancelado') notify(`Pedido #${order.short_code} cancelado`)
     } catch (error) {
       notify(errorMessage(error, 'Não foi possível atualizar o pedido.'))
+      throw error
     }
   }
 

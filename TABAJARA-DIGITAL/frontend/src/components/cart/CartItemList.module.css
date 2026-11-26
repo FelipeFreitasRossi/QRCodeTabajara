@@ -40,9 +40,16 @@
 
 .topRow {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
+}
+
+.topRow .remove {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  margin: -6px -8px 0 0;
 }
 
 .name {
@@ -62,18 +69,15 @@
 .unit {
   font-size: var(--fs-xs);
   color: var(--c-text-muted);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 10px;
   margin-top: 8px;
-}
-
-.controls .remove {
-  margin-right: -6px;
 }
 
 .remove {
@@ -111,23 +115,43 @@
 }
 
 .cards .item {
-  grid-template-columns: 76px 1fr;
+  grid-template-columns: 88px 1fr;
+  align-items: stretch;
   gap: 16px;
-  padding: 18px 0;
+  padding: 16px 0;
 }
 
 .cards .item:first-child {
-  padding-top: 6px;
+  padding-top: 4px;
+}
+
+.cards .item:last-child {
+  padding-bottom: 4px;
 }
 
 .cards .thumb {
-  width: 76px;
-  height: 76px;
-  border-radius: 14px;
+  width: 88px;
+  height: 88px;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.9);
+}
+
+.cards .info {
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.cards .name {
+  font-size: 1.1875rem;
+  font-weight: 600;
+}
+
+.cards .controls {
+  margin-top: 10px;
 }
 
 .cards .lineTotal {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
 }
 
 /* ---------- Movimento ---------- */

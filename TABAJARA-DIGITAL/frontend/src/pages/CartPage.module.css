@@ -9,10 +9,9 @@
 
 .hero {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px 18px;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 24px;
 }
 
 .eyebrow {
@@ -24,41 +23,35 @@
 }
 
 .title {
-  font-size: clamp(2.5rem, 10vw, 3.25rem);
+  font-size: clamp(2.375rem, 9vw, 3rem);
   line-height: 1;
 }
 
-.chips {
+.heroMeta {
   display: flex;
-  gap: 8px;
-  padding-bottom: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 4px;
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
-.chip {
+.heroDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  opacity: 0.7;
+}
+
+.heroTable {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: var(--radius-pill);
-  background: var(--c-surface);
-  box-shadow: inset 0 0 0 1px var(--c-line-strong);
-  font-size: 0.75rem;
   font-weight: 700;
-  color: var(--c-text-soft);
-  white-space: nowrap;
-}
-
-.chip svg {
-  color: var(--c-gold);
-}
-
-.chipGold {
-  background: var(--c-gold-soft);
-  box-shadow: inset 0 0 0 1px var(--c-gold-line);
   color: var(--c-gold-bright);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 
 /* ---------- Progresso (linha fina com 3 pontos) ---------- */
@@ -123,8 +116,6 @@
   flex-direction: column;
   gap: 10px;
   margin: 0;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--c-line);
 }
 
 .summaryRow {
@@ -167,6 +158,8 @@
   align-items: center;
   justify-content: space-between;
   margin: 16px 0 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-line);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.2em;
@@ -186,7 +179,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .notes li {
@@ -316,8 +309,14 @@
   }
 
   .layout {
-    grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr);
-    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 28px;
+  }
+
+  /* a comanda acompanha a rolagem: total e botão sempre à vista */
+  .side {
+    position: sticky;
+    top: 92px;
   }
 
   .desktopSubmit {
@@ -591,23 +590,42 @@
 /* ---------- Painéis numerados (1 Itens · 2 Seus dados · 3 Resumo) ---------- */
 
 .panel {
-  padding: 20px;
+  --panel-pad: 20px;
+  padding: var(--panel-pad);
   border: 1px solid var(--c-line);
   border-radius: var(--radius-lg);
-  background: var(--c-bg-elev);
+  background:
+    radial-gradient(120% 60% at 0% 0%, rgba(198, 161, 91, 0.045), transparent 55%),
+    var(--c-bg-elev);
 }
 
 @media (min-width: 600px) {
   .panel {
-    padding: 24px;
+    --panel-pad: 26px;
   }
 }
 
 .panelHead {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+}
+
+.panelHead .step {
+  margin-top: 2px;
+}
+
+.panelHeading {
+  flex: 1;
+  min-width: 0;
+}
+
+.panelSub {
+  margin-top: 4px;
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+  line-height: 1.4;
 }
 
 .step {
@@ -662,4 +680,138 @@
   .addNotes span {
     display: none;
   }
+}
+
+/* ---------- Seus dados: nome e mesa lado a lado em telas maiores ---------- */
+@media (min-width: 640px) {
+  .fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 16px;
+  }
+
+  .fields > :nth-child(n + 3) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---------- Comanda (resumo) ---------- */
+.receipt {
+  position: relative;
+  padding: 24px 22px 22px;
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(198, 161, 91, 0.07), transparent 140px),
+    var(--c-surface);
+  box-shadow:
+    inset 0 0 0 1px var(--c-gold-line),
+    0 24px 60px -32px rgba(0, 0, 0, 0.9);
+}
+
+/* filete dourado no topo, como a borda de uma comanda */
+.receipt::before {
+  content: '';
+  position: absolute;
+  inset: 0 22px auto;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(90deg, transparent, var(--c-gold), transparent);
+  opacity: 0.8;
+}
+
+.receiptHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.receiptCount {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--c-text-muted);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.receiptLines {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  list-style: none;
+}
+
+.receiptLines li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.receiptQty {
+  min-width: 1.6em;
+  font-weight: 700;
+  color: var(--c-gold);
+}
+
+.receiptName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.receiptPrice {
+  color: var(--c-text);
+}
+
+.receiptLines li.receiptMore {
+  display: block;
+  padding-left: calc(1.6em + 10px);
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+}
+
+/* picote: linha tracejada com "mordidas" nas bordas */
+.perforation {
+  position: relative;
+  height: 1px;
+  margin: 18px -22px;
+  background-image: linear-gradient(90deg, var(--c-line-strong) 50%, transparent 50%);
+  background-size: 10px 1px;
+}
+
+.perforation::before,
+.perforation::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--c-bg);
+  box-shadow: inset 0 0 0 1px var(--c-gold-line);
+}
+
+.perforation::before {
+  left: -9px;
+  clip-path: inset(0 0 0 50%);
+}
+
+.perforation::after {
+  right: -9px;
+  clip-path: inset(0 50% 0 0);
+}
+
+.receipt .totalRow {
+  margin-bottom: 18px;
+}
+
+.receipt .notes li {
+  align-items: flex-start;
+}
+
+.receipt .notes svg {
+  margin-top: 1px;
 }

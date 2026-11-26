@@ -11,8 +11,13 @@ frontend/node_modules/
 frontend/dist/
 frontend/.env
 frontend/.env.local
+frontend-chamar/node_modules/
+frontend-chamar/dist/
+frontend-chamar/.env
+frontend-chamar/.env.local
 
 # Sistema
 .vscode/
+.idea/
 .DS_Store
 Thumbs.db

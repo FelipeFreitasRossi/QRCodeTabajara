@@ -13,6 +13,8 @@ import type {
   LoginResponse,
   ProductInput,
 } from '../types/admin'
+import type { BillClosed, TableBill } from '../types/bill'
+import type { AdminCall } from '../types/call'
 import type { AdminOrder, OrderStatus } from '../types/order'
 import { apiBlob, apiRequest } from './api'
 
@@ -71,8 +73,11 @@ export const removeProductImage = (id: string) => req<AdminProduct>(`/admin/prod
 
 // ---------- Pedidos ----------
 export const listOrders = (signal?: AbortSignal) => req<AdminOrder[]>('/admin/orders', { signal })
-export const updateOrderStatus = (id: string, status: OrderStatus) =>
-  req<AdminOrder>(`/admin/orders/${id}/status`, { method: 'PATCH', body: { status } })
+export const updateOrderStatus = (id: string, status: OrderStatus, cancelReason?: string) =>
+  req<AdminOrder>(`/admin/orders/${id}/status`, {
+    method: 'PATCH',
+    body: cancelReason ? { status, cancel_reason: cancelReason } : { status },
+  })
 
 // ---------- Mesas ----------
 export const listTables = () => req<AdminTable[]>('/admin/tables')
@@ -83,7 +88,22 @@ export const updateTable = (id: string, data: TableInput) =>
 export const regenerateTableQr = (id: string) =>
   req<AdminTable>(`/admin/tables/${id}/qrcode/regenerate`, { method: 'POST' })
 /** PNG do QR Code da mesa, pronto para imprimir. */
-export const downloadTableQr = (id: string) => apiBlob(`/api/admin/tables/${id}/qrcode.png`, token)
+export const downloadTableQr = (id: string, tipo: 'cardapio' | 'chamar' = 'cardapio') =>
+  apiBlob(`/api/admin/tables/${id}/qrcode.png?tipo=${tipo}`, token)
+
+// ---------- Chamados (chamar atendente) ----------
+export const listCalls = (signal?: AbortSignal) => req<AdminCall[]>('/admin/chamados', { signal })
+export const attendCall = (id: string) => req<AdminCall>(`/admin/chamados/${id}/atender`, { method: 'POST' })
+
+// ---------- Conta da mesa ----------
+export const getTableBill = (tableNumber: number) => req<TableBill>(`/admin/chamados/conta/${tableNumber}`)
+/** Fecha só os pedidos que o garçom viu (os ids mostrados na tela). */
+export type PaymentMethod = 'pix' | 'credito' | 'debito' | 'dinheiro' | 'outro'
+export const closeTableBill = (tableNumber: number, orderIds: string[], paymentMethod: PaymentMethod | null = null) =>
+  req<BillClosed>(`/admin/chamados/conta/${tableNumber}/fechar`, {
+    method: 'POST',
+    body: { order_ids: orderIds, payment_method: paymentMethod },
+  })
 
 // ---------- Clube Tabajara ----------
 export const getClubSettings = () => req<ClubSettings>('/admin/club/settings')

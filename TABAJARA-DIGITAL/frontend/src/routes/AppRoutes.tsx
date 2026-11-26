@@ -10,6 +10,7 @@ import { OrderStatusPage } from '../pages/OrderStatusPage'
 import { PrivacyPage } from '../pages/PrivacyPage'
 import { TableQrPage } from '../pages/TableQrPage'
 import { ClubAdminPage } from '../pages/admin/ClubAdminPage'
+import { CallsPage } from '../pages/admin/CallsPage'
 import { CategoriesPage } from '../pages/admin/CategoriesPage'
 import { DashboardPage } from '../pages/admin/DashboardPage'
 import { LoginPage } from '../pages/admin/LoginPage'
@@ -27,6 +28,7 @@ export function AppRoutes() {
       <Route path="/carrinho" element={<CartPage />} />
       <Route path="/pedido/:code" element={<OrderStatusPage />} />
       <Route path="/m/:token" element={<TableQrPage />} />
+      {/* O QR "Chamar atendente" abre outro site (pasta frontend-chamar); os chamados chegam em /admin/chamados. */}
       <Route path="/clube" element={<ClubPage />} />
       <Route path="/privacidade" element={<PrivacyPage />} />
 
@@ -42,6 +44,7 @@ export function AppRoutes() {
       >
         <Route index element={<DashboardPage />} />
         <Route path="pedidos" element={<OrdersPage />} />
+        <Route path="chamados" element={<CallsPage />} />
         <Route path="produtos" element={<ProductsPage />} />
         <Route path="produtos/novo" element={<ProductFormPage />} />
         <Route path="produtos/:id" element={<ProductFormPage />} />

@@ -176,8 +176,9 @@
   bottom: 0;
   z-index: 40;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  padding: 6px 4px calc(var(--safe-bottom) + 6px);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  padding: 6px 2px calc(var(--safe-bottom) + 6px);
   border-top: 1px solid var(--c-line);
   background: rgba(18, 18, 17, 0.96);
   -webkit-backdrop-filter: blur(16px);
@@ -189,10 +190,11 @@
   flex-direction: column;
   align-items: center;
   gap: 3px;
+  min-width: 0;
   min-height: 52px;
   justify-content: center;
   border-radius: 12px;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 600;
   color: var(--c-text-muted);
   text-decoration: none;
@@ -256,5 +258,31 @@
 @keyframes pulse {
   50% {
     box-shadow: 0 0 0 6px rgba(198, 161, 91, 0.15);
+  }
+}
+
+.tab > span:last-child {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* contador de chamados: vermelho-cobre, para chamar mais atenção que o de pedidos */
+.badgeCall {
+  background: #e0704f;
+  color: #fff;
+  animation: pulse-call 1.6s var(--ease-out) infinite;
+}
+
+@keyframes pulse-call {
+  50% {
+    box-shadow: 0 0 0 5px rgba(224, 112, 79, 0.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badgeCall {
+    animation: none;
   }
 }

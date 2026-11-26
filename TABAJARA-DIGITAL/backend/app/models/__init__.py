@@ -11,6 +11,7 @@ from app.models.order import Order, OrderItem, OrderStatus
 from app.models.product import Product
 from app.models.reward import BirthdayGift, Reward
 from app.models.stored_file import StoredFile
+from app.models.waiter_call import CallReason, CallStatus, WaiterCall
 from app.models.table import DiningTable
 
 # Todos os documentos registrados no Beanie. Ao criar um novo modelo, adicione aqui.
@@ -27,6 +28,7 @@ DOCUMENT_MODELS = [
     Reward,
     BirthdayGift,
     StoredFile,
+    WaiterCall,
 ]
 
 __all__ = [
@@ -34,6 +36,9 @@ __all__ = [
     "BirthdayGift",
     "Reward",
     "StoredFile",
+    "WaiterCall",
+    "CallReason",
+    "CallStatus",
     "Category",
     "Customer",
     "DiningTable",

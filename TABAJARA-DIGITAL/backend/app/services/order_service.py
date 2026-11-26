@@ -141,5 +141,7 @@ def to_admin(order: Order) -> OrderAdminOut:
     return OrderAdminOut(
         id=str(order.id),
         customer_id=str(order.customer_id) if order.customer_id else None,
+        cancel_reason=order.cancel_reason,
+        cancelled_by=order.cancelled_by,
         **to_public(order).model_dump(),
     )

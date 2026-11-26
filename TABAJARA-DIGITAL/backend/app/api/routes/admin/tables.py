@@ -1,12 +1,14 @@
 import io
 
-from fastapi import APIRouter, HTTPException, Response, status
+from typing import Literal
+
+from fastapi import APIRouter, HTTPException, Query, Response, status
 from pymongo.errors import DuplicateKeyError
 
 from app.api.deps import get_or_404
 from app.models import DiningTable
 from app.schemas.catalog import TableIn, TableOut
-from app.services.catalog_service import new_qr_token, table_out, table_qr_url
+from app.services.catalog_service import new_qr_token, table_call_url, table_out, table_qr_url
 
 router = APIRouter(prefix="/tables", tags=["Admin · Mesas"])
 
@@ -71,18 +73,20 @@ async def regenerate_qr(table_id: str) -> TableOut:
 
 
 @router.get("/{table_id}/qrcode.png")
-async def table_qrcode(table_id: str) -> Response:
+async def table_qrcode(table_id: str, tipo: Literal["cardapio", "chamar"] = Query(default="cardapio")) -> Response:
+    """QR da mesa: `cardapio` (padrão) abre o cardápio; `chamar` abre só a página de chamar atendente."""
     import qrcode
     from qrcode.constants import ERROR_CORRECT_M
 
     table = await ensure_qr_token(await get_or_404(DiningTable, table_id, "Mesa não encontrada."))
     qr = qrcode.QRCode(error_correction=ERROR_CORRECT_M, box_size=16, border=2)
-    qr.add_data(table_qr_url(table))
+    qr.add_data(table_call_url(table) if tipo == "chamar" else table_qr_url(table))
     qr.make(fit=True)
     image = qr.make_image(fill_color="#0d0d0f", back_color="white")
     buffer = io.BytesIO()
     image.save(buffer, format="PNG")
-    filename = f"qrcode-mesa-{table.number:02d}.png"
+    prefix = "chamar-atendente" if tipo == "chamar" else "qrcode"
+    filename = f"{prefix}-mesa-{table.number:02d}.png"
     return Response(
         content=buffer.getvalue(),
         media_type="image/png",

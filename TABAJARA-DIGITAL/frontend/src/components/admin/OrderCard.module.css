@@ -175,3 +175,17 @@
   font-weight: 700;
   color: var(--c-gold-bright);
 }
+
+/* motivo do cancelamento (pedidos cancelados) */
+.cancelReason {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: var(--fs-xs);
+  color: #f3b39d;
+}
+
+.cancelReason span {
+  color: var(--c-text-muted);
+}

@@ -1,5 +1,6 @@
 import {
   Armchair,
+  BellRing,
   ClipboardList,
   Crown,
   ExternalLink,
@@ -22,6 +23,7 @@ import styles from './AdminLayout.module.css'
 const NAV = [
   { to: '/admin', label: 'Painel', short: 'Painel', icon: LayoutDashboard, end: true },
   { to: '/admin/pedidos', label: 'Pedidos', short: 'Pedidos', icon: ClipboardList, end: false },
+  { to: '/admin/chamados', label: 'Chamados', short: 'Chamados', icon: BellRing, end: false },
   { to: '/admin/produtos', label: 'Produtos', short: 'Produtos', icon: UtensilsCrossed, end: false },
   { to: '/admin/categorias', label: 'Categorias', short: 'Categorias', icon: Tags, end: false },
   { to: '/admin/mesas', label: 'Mesas e QR Codes', short: 'Mesas', icon: Armchair, end: false },
@@ -30,7 +32,9 @@ const NAV = [
 
 function Shell() {
   const { admin, logout } = useAuth()
-  const { pendingCount, soundOn, toggleSound } = useAdmin()
+  const { pendingCount, openCallsCount, soundOn, toggleSound } = useAdmin()
+  const badgeFor = (to: string) =>
+    to === '/admin/pedidos' ? pendingCount : to === '/admin/chamados' ? openCallsCount : 0
 
   const soundButton = (
     <button
@@ -38,8 +42,8 @@ function Shell() {
       className={styles.iconButton}
       onClick={toggleSound}
       aria-pressed={soundOn}
-      aria-label={soundOn ? 'Desativar som de novos pedidos' : 'Ativar som de novos pedidos'}
-      title={soundOn ? 'Som de novos pedidos: ligado' : 'Som de novos pedidos: desligado'}
+      aria-label={soundOn ? 'Desativar som de pedidos e chamados' : 'Ativar som de pedidos e chamados'}
+      title={soundOn ? 'Som de pedidos e chamados: ligado' : 'Som de pedidos e chamados: desligado'}
     >
       {soundOn ? <Volume2 size={18} strokeWidth={1.75} /> : <VolumeX size={18} strokeWidth={1.75} />}
     </button>
@@ -63,9 +67,12 @@ function Shell() {
             >
               <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
               <span>{label}</span>
-              {to === '/admin/pedidos' && pendingCount > 0 && (
-                <span className={styles.badge} aria-label={`${pendingCount} novos`}>
-                  {pendingCount}
+              {badgeFor(to) > 0 && (
+                <span
+                  className={cx(styles.badge, to === '/admin/chamados' && styles.badgeCall)}
+                  aria-label={`${badgeFor(to)} ${to === '/admin/chamados' ? 'abertos' : 'novos'}`}
+                >
+                  {badgeFor(to)}
                 </span>
               )}
             </NavLink>
@@ -124,7 +131,9 @@ function Shell() {
           >
             <span className={styles.tabIcon}>
               <Icon size={20} strokeWidth={1.75} aria-hidden="true" />
-              {to === '/admin/pedidos' && pendingCount > 0 && <span className={styles.tabBadge}>{pendingCount}</span>}
+              {badgeFor(to) > 0 && (
+                <span className={cx(styles.tabBadge, to === '/admin/chamados' && styles.badgeCall)}>{badgeFor(to)}</span>
+              )}
             </span>
             <span>{short}</span>
           </NavLink>

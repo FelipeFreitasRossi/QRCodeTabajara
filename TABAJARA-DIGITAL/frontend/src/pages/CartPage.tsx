@@ -22,13 +22,14 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { CartItemList } from '../components/cart/CartItemList'
 import { CartSuggestions } from '../components/cart/CartSuggestions'
+import { TablePicker } from '../components/cart/TablePicker'
 import { ClubPerks } from '../components/cart/ClubPerks'
 import { RewardLines } from '../components/cart/RewardLines'
 import { Money, Points } from '../components/ui/Money'
 import { ClubCheckout } from '../components/club/ClubCheckout'
 import { PageHeader } from '../components/layout/PageHeader'
 import { Button } from '../components/ui/Button'
-import { Field, Input, Select, TextArea } from '../components/ui/FormControls'
+import { Field, Input, TextArea } from '../components/ui/FormControls'
 import { useCart } from '../hooks/useCart'
 import { useClubCart } from '../hooks/useClubCart'
 import { useClubRules } from '../hooks/useClubRules'
@@ -59,6 +60,8 @@ interface Notice {
 }
 
 const NOTES_MAX = 300
+/** Linhas de itens mostradas na comanda; o resto vira "+ N itens". */
+const RECEIPT_LINES = 5
 const FORM_ID = 'pedido-form'
 
 /** Página do carrinho: revisar itens, Clube, nome e mesa, e enviar o pedido para a cozinha. */
@@ -267,35 +270,42 @@ export function CartPage() {
       <main className={styles.page}>
         {/* Cabeçalho */}
         <header className={styles.hero}>
-          <div>
-            <p className={styles.eyebrow}>Seu pedido</p>
-            <h1 className={styles.title}>Carrinho</h1>
-          </div>
-          <div className={styles.chips}>
-            <span className={styles.chip}>
-              <ShoppingBag size={14} aria-hidden="true" />
+          <p className={styles.eyebrow}>Seu pedido</p>
+          <h1 className={styles.title}>Carrinho</h1>
+          <p className={styles.heroMeta}>
+            <span>
               {totalCount} {totalCount === 1 ? 'item' : 'itens'}
             </span>
+            <span className={styles.heroDot} aria-hidden="true" />
+            <span>
+              <Money cents={totalCents} variant="plain" />
+            </span>
             {qrTable && (
-              <span className={cx(styles.chip, styles.chipGold)}>
-                <QrCode size={14} aria-hidden="true" />
-                {formatTable(qrTable.number)}
-              </span>
+              <>
+                <span className={styles.heroDot} aria-hidden="true" />
+                <span className={styles.heroTable}>
+                  <QrCode size={14} aria-hidden="true" />
+                  {formatTable(qrTable.number)}
+                </span>
+              </>
             )}
-          </div>
+          </p>
         </header>
 
         <div className={styles.layout}>
-          {/* ---------- Coluna principal ---------- */}
+          {/* ---------- Passos ---------- */}
           <div className={styles.mainCol}>
             <section className={styles.panel} aria-labelledby="itens-titulo">
               <header className={styles.panelHead}>
                 <span className={styles.step} aria-hidden="true">
                   1
                 </span>
-                <h2 id="itens-titulo" className={styles.panelTitle}>
-                  Itens
-                </h2>
+                <div className={styles.panelHeading}>
+                  <h2 id="itens-titulo" className={styles.panelTitle}>
+                    Itens
+                  </h2>
+                  <p className={styles.panelSub}>Ajuste as quantidades ou remova o que não quiser.</p>
+                </div>
                 <Link to="/cardapio" className={styles.headLink}>
                   <Plus size={15} aria-hidden="true" /> Adicionar
                 </Link>
@@ -307,30 +317,23 @@ export function CartPage() {
                   Há itens indisponíveis no carrinho. Remova-os para enviar o pedido.
                 </p>
               )}
+              <CartSuggestions categories={categories} onAdd={addSuggestion} embedded />
             </section>
 
             {clubActive && <ClubPerks firstName={customer?.name.split(' ')[0] ?? ''} />}
 
-            <CartSuggestions categories={categories} onAdd={addSuggestion} />
-          </div>
-
-          {/* ---------- Finalização ---------- */}
-          <aside className={styles.side}>
-            <ClubCheckout
-              typedName={name}
-              estimate={estimate}
-              onLoggedIn={(c) => {
-                if (name.trim().length < 2) setName(c.name.split(' ')[0])
-              }}
-            />
-
-            <div className={styles.panel}>
+            <section className={styles.panel} aria-labelledby="dados-titulo">
               <form id={FORM_ID} ref={formRef} onSubmit={handleSubmit} noValidate>
                 <header className={styles.panelHead}>
                   <span className={cx(styles.step, readyData && styles.stepDone)} aria-hidden="true">
                     {readyData ? <Check size={13} strokeWidth={3} /> : 2}
                   </span>
-                  <h2 className={styles.panelTitle}>Seus dados</h2>
+                  <div className={styles.panelHeading}>
+                    <h2 id="dados-titulo" className={styles.panelTitle}>
+                      Seus dados
+                    </h2>
+                    <p className={styles.panelSub}>Para a equipe saber de quem é o pedido e onde servir.</p>
+                  </div>
                 </header>
 
                 <div className={styles.fields}>
@@ -346,7 +349,7 @@ export function CartPage() {
                         }}
                         autoComplete="given-name"
                         maxLength={60}
-                        placeholder="Como podemos te chamar?"
+                        placeholder="Seu primeiro nome"
                         aria-invalid={Boolean(errors.name)}
                       />
                     </div>
@@ -378,29 +381,22 @@ export function CartPage() {
                       label="Mesa"
                       htmlFor="pedido-mesa"
                       error={errors.table}
-                      hint="O número fica na placa sobre a mesa."
+                      hint="O número está na placa sobre a mesa."
                     >
-                      <div className={styles.withIcon}>
-                        <Armchair size={18} strokeWidth={1.5} className={styles.fieldIcon} aria-hidden="true" />
-                        {tables && tables.length > 0 ? (
-                          <Select
-                            id="pedido-mesa"
-                            value={table}
-                            onChange={(event) => {
-                              setTable(event.target.value)
-                              setErrors((current) => ({ ...current, table: undefined }))
-                            }}
-                            aria-invalid={Boolean(errors.table)}
-                          >
-                            <option value="">Selecione sua mesa</option>
-                            {tables.map((t) => (
-                              <option key={t.number} value={String(t.number)}>
-                                {formatTable(t.number)}
-                                {t.label ? ` · ${t.label}` : ''}
-                              </option>
-                            ))}
-                          </Select>
-                        ) : (
+                      {tables && tables.length > 0 ? (
+                        <TablePicker
+                          id="pedido-mesa"
+                          tables={tables}
+                          value={table}
+                          invalid={Boolean(errors.table)}
+                          onChange={(value) => {
+                            setTable(value)
+                            setErrors((current) => ({ ...current, table: undefined }))
+                          }}
+                        />
+                      ) : (
+                        <div className={styles.withIcon}>
+                          <Armchair size={18} strokeWidth={1.5} className={styles.fieldIcon} aria-hidden="true" />
                           <Input
                             id="pedido-mesa"
                             type="number"
@@ -415,8 +411,8 @@ export function CartPage() {
                             placeholder={tables === null ? 'Carregando mesas…' : 'Número da mesa'}
                             aria-invalid={Boolean(errors.table)}
                           />
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </Field>
                   )}
 
@@ -448,86 +444,114 @@ export function CartPage() {
                   )}
                 </div>
               </form>
+            </section>
 
-              <div className={styles.divider} aria-hidden="true" />
+            <ClubCheckout
+              typedName={name}
+              estimate={estimate}
+              onLoggedIn={(c) => {
+                if (name.trim().length < 2) setName(c.name.split(' ')[0])
+              }}
+            />
+          </div>
 
-              {/* Resumo */}
-              <section aria-labelledby="resumo-titulo">
-                <header className={styles.panelHead}>
-                  <span className={styles.step} aria-hidden="true">
-                    3
-                  </span>
-                  <h2 id="resumo-titulo" className={styles.panelTitle}>
-                    Resumo
-                  </h2>
-                </header>
+          {/* ---------- Comanda (resumo) ---------- */}
+          <aside className={styles.side}>
+            <section className={styles.receipt} aria-labelledby="resumo-titulo">
+              <header className={styles.receiptHead}>
+                <span className={styles.step} aria-hidden="true">
+                  3
+                </span>
+                <h2 id="resumo-titulo" className={styles.panelTitle}>
+                  Resumo
+                </h2>
+                <span className={styles.receiptCount}>
+                  {totalCount} {totalCount === 1 ? 'item' : 'itens'}
+                </span>
+              </header>
 
-                <dl className={styles.summary}>
+              <ul className={styles.receiptLines}>
+                {items.slice(0, RECEIPT_LINES).map(({ product, quantity }) => (
+                  <li key={product.id}>
+                    <span className={styles.receiptQty}>{quantity}×</span>
+                    <span className={styles.receiptName}>{product.name}</span>
+                    <span className={styles.receiptPrice}>
+                      <Money cents={product.price_cents * quantity} variant="plain" />
+                    </span>
+                  </li>
+                ))}
+                {items.length > RECEIPT_LINES && (
+                  <li className={styles.receiptMore}>
+                    + {items.length - RECEIPT_LINES} {items.length - RECEIPT_LINES === 1 ? 'item' : 'itens'}
+                  </li>
+                )}
+              </ul>
+
+              <div className={styles.perforation} aria-hidden="true" />
+
+              <dl className={styles.summary}>
+                <div className={styles.summaryRow}>
+                  <dt>Subtotal</dt>
+                  <dd>
+                    <Money cents={totalCents} variant="plain" />
+                  </dd>
+                </div>
+                {hasPerks && perks.pointsCost > 0 && (
                   <div className={styles.summaryRow}>
                     <dt>
-                      Produtos <span className={styles.summaryMuted}>({count})</span>
+                      <Gift size={14} aria-hidden="true" /> Resgates com pontos
                     </dt>
-                    <dd>
-                      <Money cents={totalCents} variant="plain" />
+                    <dd className={styles.gold}>
+                      <Points value={-perks.pointsCost} signed />
                     </dd>
                   </div>
-                  {hasPerks && perks.pointsCost > 0 && (
-                    <div className={styles.summaryRow}>
-                      <dt>
-                        <Gift size={14} aria-hidden="true" /> Resgates com pontos
-                      </dt>
-                      <dd className={styles.gold}>
-                        <Points value={-perks.pointsCost} signed />
-                      </dd>
-                    </div>
-                  )}
-                  {hasPerks && perks.birthdayGift && (
-                    <div className={styles.summaryRow}>
-                      <dt>
-                        <Cake size={14} aria-hidden="true" /> Presente de aniversário
-                      </dt>
-                      <dd className={styles.gold}>Grátis</dd>
-                    </div>
-                  )}
-                  {pointsForCustomer > 0 && (
-                    <div className={styles.summaryRow}>
-                      <dt>
-                        <Sparkles size={14} aria-hidden="true" /> Você ganha
-                      </dt>
-                      <dd className={styles.gold}>
-                        <Points value={pointsForCustomer} signed />
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-
-                <div className={styles.totalRow}>
-                  <span>Total a pagar</span>
-                  <span className={styles.total}>
-                    <Money cents={animatedTotal} />
-                  </span>
-                </div>
-
-                <ul className={styles.notes}>
-                  <li>
-                    <ShieldCheck size={15} strokeWidth={1.75} aria-hidden="true" />
-                    Seu pedido vai direto para a cozinha.
-                  </li>
-                  <li>
-                    <Wallet size={15} strokeWidth={1.75} aria-hidden="true" />
-                    Pagamento no caixa ou com o atendente, ao final.
-                  </li>
-                </ul>
-
-                {submitError && (
-                  <p className={styles.alert} role="alert">
-                    {submitError}
-                  </p>
                 )}
+                {hasPerks && perks.birthdayGift && (
+                  <div className={styles.summaryRow}>
+                    <dt>
+                      <Cake size={14} aria-hidden="true" /> Presente de aniversário
+                    </dt>
+                    <dd className={styles.gold}>Grátis</dd>
+                  </div>
+                )}
+                {pointsForCustomer > 0 && (
+                  <div className={styles.summaryRow}>
+                    <dt>
+                      <Sparkles size={14} aria-hidden="true" /> Você ganha
+                    </dt>
+                    <dd className={styles.gold}>
+                      <Points value={pointsForCustomer} signed />
+                    </dd>
+                  </div>
+                )}
+              </dl>
 
-                <div className={styles.desktopSubmit}>{submitButton}</div>
-              </section>
-            </div>
+              <div className={styles.totalRow}>
+                <span>Total</span>
+                <span className={styles.total}>
+                  <Money cents={animatedTotal} />
+                </span>
+              </div>
+
+              {submitError && (
+                <p className={styles.alert} role="alert">
+                  {submitError}
+                </p>
+              )}
+
+              <div className={styles.desktopSubmit}>{submitButton}</div>
+
+              <ul className={styles.notes}>
+                <li>
+                  <ShieldCheck size={15} strokeWidth={1.75} aria-hidden="true" />
+                  Vai direto para a cozinha.
+                </li>
+                <li>
+                  <Wallet size={15} strokeWidth={1.75} aria-hidden="true" />
+                  Pagamento no caixa ou com o atendente, no final.
+                </li>
+              </ul>
+            </section>
           </aside>
         </div>
       </main>

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { CirclePlus, Copy, Download, RefreshCw, Trash2 } from 'lucide-react'
+import { BellRing, CirclePlus, Copy, Download, ReceiptText, RefreshCw, Trash2 } from 'lucide-react'
 
 import { AdminPageHeader } from '../../components/admin/AdminPageHeader'
+import { BillSheet } from '../../components/admin/BillSheet'
 import { Switch } from '../../components/admin/Switch'
 import { Button } from '../../components/ui/Button'
 import { Field, Input } from '../../components/ui/FormControls'
@@ -17,6 +18,8 @@ import styles from './CatalogAdmin.module.css'
 export function TablesPage() {
   const { notify } = useAdmin()
   const [tables, setTables] = useState<AdminTable[] | null>(null)
+  const [billTable, setBillTable] = useState<number | null>(null)
+  const [billOpen, setBillOpen] = useState(false)
   const [number, setNumber] = useState('')
   const [label, setLabel] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
@@ -73,13 +76,14 @@ export function TablesPage() {
     }
   }
 
-  const downloadQr = async (table: AdminTable) => {
+  const downloadQr = async (table: AdminTable, tipo: 'cardapio' | 'chamar' = 'cardapio') => {
     try {
-      const blob = await api.downloadTableQr(table.id)
+      const blob = await api.downloadTableQr(table.id, tipo)
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `qrcode-mesa-${String(table.number).padStart(2, '0')}.png`
+      const prefix = tipo === 'chamar' ? 'chamar-atendente' : 'qrcode'
+      link.download = `${prefix}-mesa-${String(table.number).padStart(2, '0')}.png`
       document.body.appendChild(link)
       link.click()
       link.remove()
@@ -101,7 +105,7 @@ export function TablesPage() {
 
   const regenerate = async (table: AdminTable) => {
     const ok = window.confirm(
-      `Gerar um QR Code novo para a mesa ${table.number}? O QR impresso atual deixa de funcionar e precisará ser trocado.`,
+      `Gerar um QR Code novo para a mesa ${table.number}? Os QR impressos atuais (cardápio e chamar atendente) deixam de funcionar e precisarão ser trocados.`,
     )
     if (!ok) return
     try {
@@ -177,7 +181,7 @@ export function TablesPage() {
             />
             <div className={styles.qrActions}>
               <button type="button" className={styles.qrButton} onClick={() => void downloadQr(table)}>
-                <Download size={15} aria-hidden="true" /> QR Code
+                <Download size={15} aria-hidden="true" /> QR do cardápio
               </button>
               <button
                 type="button"
@@ -198,9 +202,41 @@ export function TablesPage() {
                 <RefreshCw size={15} />
               </button>
             </div>
+            <div className={styles.qrActions}>
+              <button
+                type="button"
+                className={styles.qrButton}
+                onClick={() => void downloadQr(table, 'chamar')}
+                title="Abre só a página de chamar atendente, sem o cardápio"
+              >
+                <BellRing size={15} aria-hidden="true" /> QR de chamar atendente
+              </button>
+            </div>
+            <div className={styles.qrActions}>
+              <button
+                type="button"
+                className={styles.qrButton}
+                onClick={() => {
+                  setBillTable(table.number)
+                  setBillOpen(true)
+                }}
+                title="Pedidos desta mesa ainda não fechados"
+              >
+                <ReceiptText size={15} aria-hidden="true" /> Conta da mesa
+              </button>
+            </div>
           </li>
         ))}
       </ul>
+
+      {billTable !== null && (
+        <BillSheet
+          tableNumber={billTable}
+          open={billOpen}
+          onClose={() => setBillOpen(false)}
+          onExited={() => setBillTable(null)}
+        />
+      )}
     </div>
   )
 }

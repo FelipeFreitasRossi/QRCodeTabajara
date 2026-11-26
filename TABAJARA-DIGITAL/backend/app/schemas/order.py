@@ -66,10 +66,14 @@ class OrderPublicOut(BaseModel):
 class OrderAdminOut(OrderPublicOut):
     id: str
     customer_id: str | None = None
+    cancel_reason: str | None = None
+    cancelled_by: str | None = None
 
 
 class OrderStatusIn(StrictModel):
     status: OrderStatus
+    # Motivo do cancelamento (o painel exige; aqui é opcional para não quebrar outros usos).
+    cancel_reason: str | None = Field(default=None, max_length=200)
 
 
 class PublicTableNumber(BaseModel):

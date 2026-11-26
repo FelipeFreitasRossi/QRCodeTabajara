@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 
 import { useCart } from '../../hooks/useCart'
 import type { Category, Product } from '../../types/menu'
+import { cx } from '../../utils/dom'
 import { formatPrice } from '../../utils/format'
 import { ProductImage } from '../ui/ProductImage'
 import styles from './CartSuggestions.module.css'
@@ -12,6 +13,8 @@ interface CartSuggestionsProps {
   categories: Category[]
   /** `source`: foto do item, de onde a animação voa até a sacola. */
   onAdd: (product: Product, source: HTMLElement | null) => void
+  /** Dentro de um painel (página do carrinho): título menor e trilho que ocupa a largura do painel. */
+  embedded?: boolean
 }
 
 // Categorias que costumam completar um pedido, na ordem de prioridade (pelo endereço da categoria).
@@ -25,7 +28,7 @@ const rank = (slug: string) => {
  * "Para acompanhar": sugestões reais do cardápio (bebidas, acompanhamentos,
  * sobremesas) que ainda não estão no carrinho. Um toque adiciona.
  */
-export function CartSuggestions({ categories, onAdd }: CartSuggestionsProps) {
+export function CartSuggestions({ categories, onAdd, embedded = false }: CartSuggestionsProps) {
   const { items } = useCart()
   const refs = useRef(new Map<string, HTMLElement>())
   const inCart = useMemo(() => new Set(items.map((i) => i.product.id)), [items])
@@ -55,12 +58,12 @@ export function CartSuggestions({ categories, onAdd }: CartSuggestionsProps) {
   if (suggestions.length === 0) return null
 
   return (
-    <section className={styles.section} aria-labelledby="sugestoes-titulo">
+    <section className={cx(styles.section, embedded && styles.embedded)} aria-labelledby="sugestoes-titulo">
       <div className={styles.head}>
         <h2 id="sugestoes-titulo" className={styles.title}>
           Para acompanhar
         </h2>
-        <span className={styles.hint}>Toque no + para adicionar</span>
+        <span className={styles.hint}>Um toque adiciona ao pedido</span>
       </div>
       <ul className={styles.track}>
         {suggestions.map((product, index) => (

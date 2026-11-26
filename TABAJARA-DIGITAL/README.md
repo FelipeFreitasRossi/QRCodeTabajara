@@ -208,3 +208,41 @@ Crie um repositório **privado** e envie a pasta do projeto (o `.gitignore` já 
 Toda vez que você enviar mudanças ao GitHub, o Render publica de novo sozinho.
 
 **Reforço opcional:** crie um monitor gratuito no UptimeRobot (HTTP, a cada 5 min) para `https://tabajara-api.onrender.com/api/health`. Ele também avisa por e-mail se a API cair.
+
+## Chamar atendente (site separado: `frontend-chamar/`)
+
+O projeto tem **dois frontends** que usam a mesma API e o mesmo banco:
+
+| Pasta | Para quê | Porta no computador |
+|---|---|---|
+| `frontend/` | cardápio, carrinho, Clube e **painel Admin** | 5173 |
+| `frontend-chamar/` | só a página do **QR "Chamar atendente"** | 5174 |
+
+Cada mesa tem **dois QR Codes** (painel > **Mesas e QR Codes**):
+
+- **QR do cardápio**: `PUBLIC_SITE_URL/m/<código>`.
+- **QR de chamar atendente**: `CALL_SITE_URL/chamar/<código>`. Abre o site separado, sem cardápio nem carrinho.
+  O cliente toca em **Chamar atendente**, **Pedir a conta** ou **Ajuda com o pedido**.
+
+Os chamados aparecem no painel em **Chamados**, com aviso sonoro, contador no menu e no título da aba.
+O botão **Atendido** avisa o cliente na hora.
+
+**No computador**, rode os dois frontends (cada um no seu terminal) e, no `backend/.env`:
+
+```
+CORS_ORIGINS=http://localhost:5173,http://localhost:5174
+CALL_SITE_URL=http://localhost:5174
+```
+
+**No Render**, o `render.yaml` cria o serviço `tabajara-chamar`. Na API, `CALL_SITE_URL` é o endereço dele e
+`CORS_ORIGINS` precisa ter **os dois sites**, separados por vírgula.
+
+**Pedir a conta / Conta da mesa.** A conta da mesa são todos os pedidos daquela mesa ainda não fechados (das últimas
+12 horas, sem os cancelados). No chamado "Pedir a conta", o cartão já mostra o total, quantos pedidos e quem pediu;
+"Ver conta e fechar" abre os pedidos com os itens. **Fechar conta** marca exatamente os pedidos mostrados (um pedido que
+chegue enquanto o garçom olha não entra) e encerra o chamado. Os próximos clientes da mesa começam com a conta zerada.
+A conta de qualquer mesa também abre em **Mesas e QR Codes > Conta da mesa**.
+
+Proteções: o QR usa o código secreto da mesa (não o número), cada mesa tem no máximo um chamado aberto (tocar de novo
+só conta "chamou 2×" e "Pedir a conta" prevalece), há um intervalo de 20 s depois de encerrado e limites de tentativas.
+**Gerar novo QR** de uma mesa troca os dois QR Codes dela.

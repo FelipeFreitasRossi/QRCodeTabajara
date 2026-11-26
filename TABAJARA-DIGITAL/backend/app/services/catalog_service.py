@@ -52,6 +52,7 @@ def table_out(table: DiningTable) -> TableOut:
         active=table.active,
         seats=table.seats,
         qr_url=table_qr_url(table),
+        call_url=table_call_url(table),
     )
 
 
@@ -63,6 +64,14 @@ def table_qr_url(table: DiningTable) -> str | None:
     if not table.qr_token:
         return None
     return f"{settings.public_site_url.rstrip('/')}/m/{table.qr_token}"
+
+
+def table_call_url(table: DiningTable) -> str | None:
+    """QR de chamar atendente: mesmo código da mesa, no site separado (frontend-chamar)."""
+    if not table.qr_token:
+        return None
+    base = (settings.call_site_url or settings.public_site_url).rstrip("/")
+    return f"{base}/chamar/{table.qr_token}"
 
 
 async def next_product_position(category_id) -> int:
