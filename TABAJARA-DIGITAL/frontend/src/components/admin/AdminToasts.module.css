@@ -1,0 +1,264 @@
+.region {
+  position: fixed;
+  top: calc(var(--header-h) + var(--safe-top) + 10px);
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 var(--page-pad);
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .region {
+    left: auto;
+    right: 20px;
+    width: 380px;
+    padding: 0;
+    align-items: stretch;
+  }
+}
+
+.toast {
+  --accent: var(--c-gold);
+  --accent-soft: rgba(198, 161, 91, 0.16);
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(24, 23, 21, 0.97);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 3px 0 0 var(--accent),
+    0 22px 50px -22px rgba(0, 0, 0, 0.95);
+  pointer-events: auto;
+  animation: in 460ms cubic-bezier(0.17, 0.89, 0.32, 1.18) both;
+}
+
+@keyframes in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -14px, 0) scale(0.96);
+  }
+}
+
+@media (min-width: 900px) {
+  @keyframes in {
+    from {
+      opacity: 0;
+      transform: translate3d(28px, 0, 0) scale(0.98);
+    }
+  }
+}
+
+.leaving {
+  animation: out 260ms var(--ease-out) forwards;
+}
+
+@keyframes out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0) scale(0.97);
+  }
+}
+
+.success {
+  --accent: #8fd19e;
+  --accent-soft: rgba(143, 209, 158, 0.16);
+}
+
+.error {
+  --accent: #e0704f;
+  --accent-soft: rgba(224, 112, 79, 0.18);
+}
+
+.info {
+  --accent: #9db7d6;
+  --accent-soft: rgba(157, 183, 214, 0.16);
+}
+
+.order {
+  --accent: var(--c-gold-bright);
+  --accent-soft: rgba(198, 161, 91, 0.2);
+}
+
+.call {
+  --accent: #f0a14f;
+  --accent-soft: rgba(240, 161, 79, 0.2);
+}
+
+.body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  padding: 14px 6px 16px 16px;
+  text-align: left;
+  color: var(--c-text);
+}
+
+button.body {
+  cursor: pointer;
+}
+
+button.body:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+button.body:focus-visible {
+  outline: 2px solid var(--c-gold-bright);
+  outline-offset: -2px;
+}
+
+.icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* chamado: anel pulsando em volta do sino */
+.call .icon::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 1.5px solid var(--accent);
+  animation: ring 1.6s var(--ease-out) infinite;
+}
+
+.call .icon svg {
+  animation: ding 1.6s var(--ease-out) infinite;
+  transform-origin: 50% 10%;
+}
+
+@keyframes ring {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes ding {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(14deg);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  40% {
+    transform: rotate(6deg);
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.detail {
+  font-size: var(--fs-sm);
+  color: var(--c-text-soft);
+  line-height: 1.4;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.only {
+  padding-top: 6px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  margin: 6px 6px 6px 0;
+  border-radius: 10px;
+  color: var(--c-text-muted);
+  align-self: flex-start;
+  height: 36px;
+}
+
+.close:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--c-text);
+}
+
+/* barra de tempo até o aviso sumir */
+.progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--accent);
+  opacity: 0.7;
+  transform-origin: left;
+  animation-name: shrink;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes shrink {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .leaving,
+  .call .icon::after,
+  .call .icon svg {
+    animation: none;
+  }
+
+  .progress {
+    display: none;
+  }
+}

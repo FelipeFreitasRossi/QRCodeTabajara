@@ -12,6 +12,9 @@ import type {
   Dashboard,
   LoginResponse,
   ProductInput,
+  StaffInput,
+  StaffMember,
+  StaffRole,
 } from '../types/admin'
 import type { BillClosed, TableBill } from '../types/bill'
 import type { AdminCall } from '../types/call'
@@ -135,3 +138,13 @@ export const removeRewardImage = (id: string) =>
 export const resetCustomerPin = (id: string, pin: string) =>
   req<AdminCustomer>(`/admin/club/customers/${id}/pin`, { method: 'POST', body: { pin } })
 export const deleteTable = (id: string) => req<void>(`/admin/tables/${id}`, { method: 'DELETE' })
+
+// ---------- Equipe (só gerente) ----------
+export const listStaff = () => req<StaffMember[]>('/admin/equipe')
+export const createStaff = (data: StaffInput) => req<StaffMember>('/admin/equipe', { method: 'POST', body: data })
+export const updateStaff = (
+  id: string,
+  data: Partial<{ name: string; email: string; role: StaffRole; active: boolean }>,
+) => req<StaffMember>(`/admin/equipe/${id}`, { method: 'PATCH', body: data })
+export const resetStaffPassword = (id: string, password: string) =>
+  req<StaffMember>(`/admin/equipe/${id}/senha`, { method: 'POST', body: { password } })

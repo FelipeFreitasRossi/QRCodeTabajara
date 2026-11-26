@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { Toast } from '../components/ui/Toast'
-import type { ToastMessage } from '../components/ui/Toast'
+import { AdminToasts, keepNewest, makeToast } from '../components/admin/AdminToasts'
+import type { AdminToast, NotifyOptions } from '../components/admin/AdminToasts'
 import { errorMessage } from '../services/api'
 import * as adminService from '../services/adminService'
 import type { AdminCall } from '../types/call'
 import { CALL_REASON_LABEL, callTableName } from '../types/call'
 import type { AdminOrder, OrderStatus } from '../types/order'
+import { formatPrice } from '../utils/format'
 import { playBell, playChime, unlockSound } from '../utils/sound'
 import { readJSON, writeJSON } from '../utils/storage'
 import { AdminContext } from './adminContext'
@@ -25,7 +26,7 @@ const SOUND_KEY = 'tabajara:admin-som'
 export function AdminProvider({ children }: { children: ReactNode }) {
   const [orders, setOrders] = useState<AdminOrder[] | null>(null)
   const [ordersError, setOrdersError] = useState<string | null>(null)
-  const [toast, setToast] = useState<ToastMessage | null>(null)
+  const [toasts, setToasts] = useState<AdminToast[]>([])
   const [soundOn, setSoundOn] = useState(() => readJSON<boolean>(SOUND_KEY, true))
   const knownIds = useRef<Set<string> | null>(null)
   const [calls, setCalls] = useState<AdminCall[] | null>(null)
@@ -38,13 +39,12 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     soundRef.current = soundOn
   }, [soundOn])
 
-  const notify = useCallback((text: string) => setToast({ id: Date.now() + Math.random(), text }), [])
+  const notify = useCallback(
+    (text: string, options?: NotifyOptions) => setToasts((list) => keepNewest([...list, makeToast(text, options)])),
+    [],
+  )
+  const dismiss = useCallback((id: number) => setToasts((list) => list.filter((t) => t.id !== id)), [])
 
-  useEffect(() => {
-    if (!toast) return
-    const timer = window.setTimeout(() => setToast(null), 2700)
-    return () => window.clearTimeout(timer)
-  }, [toast])
 
   const refreshOrders = useCallback(async () => {
     try {
@@ -55,10 +55,20 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         if (fresh.length > 0) {
           if (soundRef.current) playChime()
           const first = fresh[0]
+          const items = first.items.reduce((sum, item) => sum + item.quantity, 0)
           notify(
             fresh.length === 1
-              ? `Novo pedido · Mesa ${String(first.table_number).padStart(2, '0')}`
-              : `${fresh.length} novos pedidos`,
+              ? `${first.customer_name} · ${formatPrice(first.total_cents)} · ${items} ${items === 1 ? 'item' : 'itens'}`
+              : `Mesas ${[...new Set(fresh.map((o) => String(o.table_number).padStart(2, '0')))].join(', ')}`,
+            {
+              kind: 'order',
+              title:
+                fresh.length === 1
+                  ? `Novo pedido · Mesa ${String(first.table_number).padStart(2, '0')}`
+                  : `${fresh.length} novos pedidos`,
+              href: '/admin/pedidos',
+              action: 'Ver pedidos',
+            },
           )
         }
       }
@@ -84,8 +94,14 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           const first = fresh[0]
           notify(
             fresh.length === 1
-              ? `${callTableName(first.table_number)} · ${CALL_REASON_LABEL[first.reason]}`
-              : `${fresh.length} mesas chamando`,
+              ? `${CALL_REASON_LABEL[first.reason]}${first.repeats > 0 ? ` · chamou ${first.repeats + 1}×` : ''}`
+              : fresh.map((c) => callTableName(c.table_number)).join(', '),
+            {
+              kind: 'call',
+              title: fresh.length === 1 ? `${callTableName(first.table_number)} está chamando` : `${fresh.length} mesas chamando`,
+              href: '/admin/chamados',
+              action: 'Ver chamados',
+            },
           )
         }
       }
@@ -185,7 +201,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   return (
     <AdminContext.Provider value={value}>
       {children}
-      <Toast toast={toast} />
+      <AdminToasts toasts={toasts} onDismiss={dismiss} />
     </AdminContext.Provider>
   )
 }

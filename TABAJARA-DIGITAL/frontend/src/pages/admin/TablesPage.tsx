@@ -8,8 +8,10 @@ import { Switch } from '../../components/admin/Switch'
 import { Button } from '../../components/ui/Button'
 import { Field, Input } from '../../components/ui/FormControls'
 import { useAdmin } from '../../hooks/useAdmin'
+import { useAuth } from '../../hooks/useAuth'
 import { errorMessage } from '../../services/api'
 import * as api from '../../services/adminService'
+import { isManager } from '../../types/admin'
 import type { AdminTable } from '../../types/admin'
 import { cx } from '../../utils/dom'
 import styles from './CatalogAdmin.module.css'
@@ -17,6 +19,8 @@ import styles from './CatalogAdmin.module.css'
 /** Mesas que o cliente pode escolher ao enviar o pedido. */
 export function TablesPage() {
   const { notify } = useAdmin()
+  // O garçom só vê as mesas e abre a conta; criar, mudar e gerar QR é do gerente.
+  const manager = isManager(useAuth().admin)
   const [tables, setTables] = useState<AdminTable[] | null>(null)
   const [billTable, setBillTable] = useState<number | null>(null)
   const [billOpen, setBillOpen] = useState(false)
@@ -124,12 +128,15 @@ export function TablesPage() {
       <AdminPageHeader
         title="Mesas"
         subtitle={
-          tables
-            ? `${activeCount} de ${tables.length} mesas ativas · cada mesa tem um QR Code que abre o cardápio já identificado`
-            : 'Carregando…'
+          !tables
+            ? 'Carregando…'
+            : manager
+              ? `${activeCount} de ${tables.length} mesas ativas · cada mesa tem um QR Code que abre o cardápio já identificado`
+              : `${activeCount} mesas ativas · toque em "Conta da mesa" para ver e fechar a conta`
         }
       />
 
+      {manager && (
       <form className={styles.addCard} onSubmit={create} noValidate>
         <Field label="Número" htmlFor="mesa-num" error={formError}>
           <Input
@@ -156,29 +163,36 @@ export function TablesPage() {
           Adicionar mesa
         </Button>
       </form>
+      )}
 
       {tables && tables.length === 0 && <p className={styles.empty}>Nenhuma mesa cadastrada.</p>}
 
-      <ul className={styles.tableGrid}>
-        {tables?.map((table) => (
+      <ul className={cx(styles.tableGrid, !manager && styles.tableGridCompact)}>
+        {tables?.filter((table) => manager || table.active).map((table) => (
           <li key={table.id} className={cx(styles.tableCard, !table.active && styles.inactive)}>
             <div className={styles.tableHead}>
               <span className={styles.tableNumber}>{String(table.number).padStart(2, '0')}</span>
-              <button
-                type="button"
-                className={`${styles.iconButton} ${styles.danger}`}
-                onClick={() => void remove(table)}
-                aria-label={`Excluir mesa ${table.number}`}
-              >
-                <Trash2 size={16} />
-              </button>
+              {manager && (
+                <button
+                  type="button"
+                  className={`${styles.iconButton} ${styles.danger}`}
+                  onClick={() => void remove(table)}
+                  aria-label={`Excluir mesa ${table.number}`}
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
             </div>
             <span className={styles.muted}>{table.label ?? 'Salão'}</span>
-            <Switch
-              checked={table.active}
-              onChange={(active) => void toggle(table, active)}
-              label={table.active ? 'Ativa' : 'Inativa'}
-            />
+            {manager && (
+              <Switch
+                checked={table.active}
+                onChange={(active) => void toggle(table, active)}
+                label={table.active ? 'Ativa' : 'Inativa'}
+              />
+            )}
+            {manager && (
+            <>
             <div className={styles.qrActions}>
               <button type="button" className={styles.qrButton} onClick={() => void downloadQr(table)}>
                 <Download size={15} aria-hidden="true" /> QR do cardápio
@@ -212,6 +226,8 @@ export function TablesPage() {
                 <BellRing size={15} aria-hidden="true" /> QR de chamar atendente
               </button>
             </div>
+            </>
+            )}
             <div className={styles.qrActions}>
               <button
                 type="button"

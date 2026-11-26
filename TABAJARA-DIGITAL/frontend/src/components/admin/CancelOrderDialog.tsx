@@ -1,22 +1,25 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { Ban, Gift, Sparkles, X } from 'lucide-react'
+import { Ban, Copy, Gift, PackageX, PencilLine, Sparkles, Undo2, UserX, X } from 'lucide-react'
 
 import type { AdminOrder } from '../../types/order'
-import { formatPoints } from '../../utils/format'
+import { ORDER_STATUS_LABEL } from '../../types/order'
+import { cx } from '../../utils/dom'
+import { formatPoints, timeAgo } from '../../utils/format'
 import { Money } from '../ui/Money'
 import { ChoiceChips, ConfirmDialog } from './ConfirmDialog'
 import styles from './CancelOrderDialog.module.css'
 
-const REASONS = [
-  { value: 'Cliente desistiu', label: 'Cliente desistiu' },
-  { value: 'Item em falta', label: 'Item em falta' },
-  { value: 'Pedido duplicado', label: 'Pedido duplicado' },
-  { value: 'Feito por engano', label: 'Feito por engano' },
-  { value: 'outro', label: 'Outro' },
-] as const
+type Reason = 'Cliente desistiu' | 'Item em falta' | 'Pedido duplicado' | 'Feito por engano' | 'outro'
 
-type Reason = (typeof REASONS)[number]['value']
+const REASONS: { value: Reason; label: string; icon: ReactNode }[] = [
+  { value: 'Cliente desistiu', label: 'Cliente desistiu', icon: <UserX size={15} /> },
+  { value: 'Item em falta', label: 'Item em falta', icon: <PackageX size={15} /> },
+  { value: 'Pedido duplicado', label: 'Pedido duplicado', icon: <Copy size={15} /> },
+  { value: 'Feito por engano', label: 'Feito por engano', icon: <Undo2 size={15} /> },
+  { value: 'outro', label: 'Outro', icon: <PencilLine size={15} /> },
+]
+const OTHER_MAX = 200
 
 const MAX_ITEMS = 4
 
@@ -77,13 +80,25 @@ export function CancelOrderDialog({ order, open, onClose, onExited, onConfirm }:
     >
       <div className={styles.summary}>
         <div className={styles.summaryHead}>
-          <strong>{order.customer_name}</strong>
-          <Money cents={order.total_cents} variant="plain" />
+          <div className={styles.who}>
+            <strong>{order.customer_name}</strong>
+            <span className={styles.meta}>
+              <span className={cx(styles.status, styles[`s_${order.status}`])}>{ORDER_STATUS_LABEL[order.status]}</span>
+              feito {timeAgo(order.created_at)}
+            </span>
+          </div>
+          <span className={styles.total}>
+            <Money cents={order.total_cents} variant="plain" />
+          </span>
         </div>
         <ul className={styles.items}>
           {order.items.slice(0, MAX_ITEMS).map((item, i) => (
             <li key={i}>
-              <span className={styles.qty}>{item.quantity}×</span> {item.name}
+              <span className={styles.qty}>{item.quantity}×</span>
+              <span className={styles.itemName}>{item.name}</span>
+              <span className={styles.itemPrice}>
+                {item.subtotal_cents === 0 ? 'grátis' : <Money cents={item.subtotal_cents} variant="plain" />}
+              </span>
             </li>
           ))}
           {order.items.length > MAX_ITEMS && <li className={styles.more}>+ {order.items.length - MAX_ITEMS} itens</li>}
@@ -101,19 +116,27 @@ export function CancelOrderDialog({ order, open, onClose, onExited, onConfirm }:
         </ul>
       )}
 
-      <ChoiceChips label="Motivo do cancelamento" options={[...REASONS]} value={reason} onChange={setReason} />
+      <ChoiceChips label="Motivo do cancelamento" options={REASONS} value={reason} onChange={setReason} />
       {reason === 'outro' && (
-        <input
-          className={styles.other}
-          value={other}
-          onChange={(event) => setOther(event.target.value)}
-          maxLength={200}
-          placeholder="Escreva o motivo"
-          aria-label="Motivo do cancelamento"
-          autoFocus
-        />
+        <div className={styles.otherWrap}>
+          <textarea
+            className={styles.other}
+            value={other}
+            onChange={(event) => setOther(event.target.value)}
+            maxLength={OTHER_MAX}
+            rows={2}
+            placeholder="Escreva o motivo"
+            aria-label="Motivo do cancelamento"
+            autoFocus
+          />
+          <span className={styles.counter}>
+            {other.length}/{OTHER_MAX}
+          </span>
+        </div>
       )}
-      {!finalReason && <p className={styles.hint}>Escolha o motivo para poder cancelar.</p>}
+      <p className={cx(styles.hint, finalReason && styles.hintOk)} aria-live="polite">
+        {finalReason ? `Motivo: ${finalReason}` : 'Escolha o motivo para poder cancelar.'}
+      </p>
     </ConfirmDialog>
   )
 }

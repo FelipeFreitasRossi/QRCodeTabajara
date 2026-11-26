@@ -1,3 +1,4 @@
+import type { NotifyOptions } from '../components/admin/AdminToasts'
 import { createContext } from 'react'
 
 import type { AdminCall } from '../types/call'
@@ -19,7 +20,8 @@ export interface AdminContextValue {
   soundOn: boolean
   toggleSound: () => void
   /** Mostra um aviso rápido no painel. */
-  notify: (text: string) => void
+  /** Aviso no canto do painel. Sem opções: sucesso (ou erro, se a mensagem for de falha). */
+  notify: (text: string, options?: NotifyOptions) => void
 }
 
 export const AdminContext = createContext<AdminContextValue | null>(null)

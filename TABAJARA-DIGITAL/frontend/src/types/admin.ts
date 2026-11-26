@@ -2,11 +2,39 @@
 
 import type { AdminOrder } from './order'
 
+/** "admin" = gerente (acesso total); "garcom" = chamados, pedidos e contas. */
+export type StaffRole = 'admin' | 'garcom'
+
 export interface AdminUser {
   id: string
   name: string
   email: string
   role: string
+}
+
+/** Só o gerente mexe em cardápio, preços, Clube, mesas e equipe. O servidor confere de novo. */
+export const isManager = (user: Pick<AdminUser, 'role'> | null | undefined) => user?.role === 'admin'
+
+export const ROLE_LABEL: Record<string, string> = { admin: 'Gerente', garcom: 'Garçom' }
+
+// Espelha backend/app/schemas/staff.py
+export interface StaffMember {
+  id: string
+  name: string
+  email: string
+  role: StaffRole
+  active: boolean
+  /** Bloqueado por muitas senhas erradas (libera sozinho em 15 min ou com senha nova). */
+  locked: boolean
+  is_me: boolean
+  created_at: string
+}
+
+export interface StaffInput {
+  name: string
+  email: string
+  password: string
+  role: StaffRole
 }
 
 export interface LoginResponse {

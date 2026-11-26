@@ -2,10 +2,10 @@ import io
 
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pymongo.errors import DuplicateKeyError
 
-from app.api.deps import get_or_404
+from app.api.deps import get_or_404, require_admin
 from app.models import DiningTable
 from app.schemas.catalog import TableIn, TableOut
 from app.services.catalog_service import new_qr_token, table_call_url, table_out, table_qr_url
@@ -13,6 +13,8 @@ from app.services.catalog_service import new_qr_token, table_call_url, table_out
 router = APIRouter(prefix="/tables", tags=["Admin · Mesas"])
 
 DUPLICATE = "Já existe uma mesa com esse número."
+# O garçom só lista as mesas (para abrir a conta); criar, mudar, apagar e gerar QR é do gerente.
+ADMIN_ONLY = [Depends(require_admin)]
 
 
 async def ensure_qr_token(table: DiningTable) -> DiningTable:
@@ -29,7 +31,7 @@ async def list_tables() -> list[TableOut]:
     return [table_out(await ensure_qr_token(t)) for t in tables]
 
 
-@router.post("", response_model=TableOut, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=TableOut, status_code=status.HTTP_201_CREATED, dependencies=ADMIN_ONLY)
 async def create_table(data: TableIn) -> TableOut:
     if await DiningTable.find_one({"number": data.number}):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=DUPLICATE)
@@ -48,7 +50,7 @@ async def create_table(data: TableIn) -> TableOut:
     return table_out(table)
 
 
-@router.put("/{table_id}", response_model=TableOut)
+@router.put("/{table_id}", response_model=TableOut, dependencies=ADMIN_ONLY)
 async def update_table(table_id: str, data: TableIn) -> TableOut:
     table = await get_or_404(DiningTable, table_id, "Mesa não encontrada.")
     other = await DiningTable.find_one({"number": data.number})
@@ -63,7 +65,7 @@ async def update_table(table_id: str, data: TableIn) -> TableOut:
     return table_out(await ensure_qr_token(table))
 
 
-@router.post("/{table_id}/qrcode/regenerate", response_model=TableOut)
+@router.post("/{table_id}/qrcode/regenerate", response_model=TableOut, dependencies=ADMIN_ONLY)
 async def regenerate_qr(table_id: str) -> TableOut:
     """Gera um QR novo (o impresso antigo deixa de funcionar). Útil se o adesivo vazar ou for copiado."""
     table = await get_or_404(DiningTable, table_id, "Mesa não encontrada.")
@@ -72,7 +74,7 @@ async def regenerate_qr(table_id: str) -> TableOut:
     return table_out(table)
 
 
-@router.get("/{table_id}/qrcode.png")
+@router.get("/{table_id}/qrcode.png", dependencies=ADMIN_ONLY)
 async def table_qrcode(table_id: str, tipo: Literal["cardapio", "chamar"] = Query(default="cardapio")) -> Response:
     """QR da mesa: `cardapio` (padrão) abre o cardápio; `chamar` abre só a página de chamar atendente."""
     import qrcode
@@ -94,7 +96,7 @@ async def table_qrcode(table_id: str, tipo: Literal["cardapio", "chamar"] = Quer
     )
 
 
-@router.delete("/{table_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{table_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=ADMIN_ONLY)
 async def delete_table(table_id: str) -> Response:
     table = await get_or_404(DiningTable, table_id, "Mesa não encontrada.")
     await table.delete()

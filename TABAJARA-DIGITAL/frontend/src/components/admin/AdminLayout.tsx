@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   LogOut,
   Tags,
+  Users,
   UtensilsCrossed,
   Volume2,
   VolumeX,
@@ -16,22 +17,41 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { AdminProvider } from '../../contexts/AdminProvider'
 import { useAdmin } from '../../hooks/useAdmin'
 import { useAuth } from '../../hooks/useAuth'
+import { isManager, ROLE_LABEL } from '../../types/admin'
 import { cx } from '../../utils/dom'
 import { Logo } from '../ui/Logo'
 import styles from './AdminLayout.module.css'
 
-const NAV = [
-  { to: '/admin', label: 'Painel', short: 'Painel', icon: LayoutDashboard, end: true },
-  { to: '/admin/pedidos', label: 'Pedidos', short: 'Pedidos', icon: ClipboardList, end: false },
+interface NavItem {
+  to: string
+  label: string
+  short: string
+  icon: typeof LayoutDashboard
+  end: boolean
+  /** Só o gerente vê. */
+  manager?: boolean
+  /** No celular fica no topo (a barra de baixo já está cheia). */
+  topOnMobile?: boolean
+}
+
+const NAV: NavItem[] = [
+  { to: '/admin', label: 'Painel', short: 'Painel', icon: LayoutDashboard, end: true, manager: true },
   { to: '/admin/chamados', label: 'Chamados', short: 'Chamados', icon: BellRing, end: false },
-  { to: '/admin/produtos', label: 'Produtos', short: 'Produtos', icon: UtensilsCrossed, end: false },
-  { to: '/admin/categorias', label: 'Categorias', short: 'Categorias', icon: Tags, end: false },
+  { to: '/admin/pedidos', label: 'Pedidos', short: 'Pedidos', icon: ClipboardList, end: false },
   { to: '/admin/mesas', label: 'Mesas e QR Codes', short: 'Mesas', icon: Armchair, end: false },
-  { to: '/admin/clube', label: 'Clube Tabajara', short: 'Clube', icon: Crown, end: false },
+  { to: '/admin/produtos', label: 'Produtos', short: 'Produtos', icon: UtensilsCrossed, end: false, manager: true },
+  { to: '/admin/categorias', label: 'Categorias', short: 'Categorias', icon: Tags, end: false, manager: true },
+  { to: '/admin/clube', label: 'Clube Tabajara', short: 'Clube', icon: Crown, end: false, manager: true },
+  { to: '/admin/equipe', label: 'Equipe', short: 'Equipe', icon: Users, end: false, manager: true, topOnMobile: true },
 ]
 
 function Shell() {
   const { admin, logout } = useAuth()
+  const manager = isManager(admin)
+  const nav = NAV.filter((item) => manager || !item.manager).map((item) =>
+    // Para o garçom, "Mesas" é só para abrir a conta.
+    !manager && item.to === '/admin/mesas' ? { ...item, label: 'Mesas e contas' } : item,
+  )
   const { pendingCount, openCallsCount, soundOn, toggleSound } = useAdmin()
   const badgeFor = (to: string) =>
     to === '/admin/pedidos' ? pendingCount : to === '/admin/chamados' ? openCallsCount : 0
@@ -58,7 +78,7 @@ function Shell() {
           <span className={styles.brandTag}>Painel</span>
         </div>
         <nav className={styles.nav} aria-label="Menu do painel">
-          {NAV.map(({ to, label, icon: Icon, end }) => (
+          {nav.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
@@ -86,7 +106,9 @@ function Shell() {
           <div className={styles.user}>
             <div className={styles.userInfo}>
               <span className={styles.userName}>{admin?.name}</span>
-              <span className={styles.userEmail}>{admin?.email}</span>
+              <span className={styles.userEmail}>
+                {ROLE_LABEL[admin?.role ?? ''] ?? 'Equipe'} · {admin?.email}
+              </span>
             </div>
             {soundButton}
             <button
@@ -106,9 +128,19 @@ function Shell() {
       <header className={styles.topbar}>
         <div className={styles.brand}>
           <Logo size="sm" />
-          <span className={styles.brandTag}>Painel</span>
+          <span className={styles.brandTag}>{manager ? 'Painel' : 'Garçom'}</span>
         </div>
         <div className={styles.topActions}>
+          {manager && (
+            <NavLink
+              to="/admin/equipe"
+              className={({ isActive }) => cx(styles.iconButton, isActive && styles.iconButtonOn)}
+              aria-label="Equipe (garçons e gerentes)"
+              title="Equipe"
+            >
+              <Users size={18} strokeWidth={1.75} />
+            </NavLink>
+          )}
           {soundButton}
           <button type="button" className={styles.iconButton} onClick={logout} aria-label="Sair do painel">
             <LogOut size={18} strokeWidth={1.75} />
@@ -122,7 +154,9 @@ function Shell() {
 
       {/* Navegação inferior (celular) */}
       <nav className={styles.tabbar} aria-label="Menu do painel">
-        {NAV.map(({ to, short, icon: Icon, end }) => (
+        {nav
+          .filter((item) => !item.topOnMobile)
+          .map(({ to, short, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}

@@ -109,3 +109,37 @@ def test_chamar_pelo_numero_so_em_desenvolvimento():
     assert Settings(**base).allow_call_by_number is True
     assert Settings(**base, environment="production").allow_call_by_number is False
     assert Settings(**base, environment="production", call_by_number=True).allow_call_by_number is True
+
+
+def test_cadastro_da_equipe_valida_os_dados():
+    import pytest
+    from pydantic import ValidationError
+
+    from app.schemas.staff import StaffCreateIn
+
+    ok = StaffCreateIn(name="  João   Silva ", email=" Joao@X.com ", password="1234567890")
+    assert (ok.name, ok.email, ok.role) == ("João Silva", "joao@x.com", "garcom")
+    for bad in (
+        {"name": "Jo", "email": "a@b.co", "password": "curta"},
+        {"name": "Jo", "email": "sem-arroba", "password": "1234567890"},
+        {"name": "Jo", "email": "a@b.co", "password": "1234567890", "role": "dono"},
+        {"name": "Jo", "email": "a@b.co", "password": "1234567890", "active": True},
+    ):
+        with pytest.raises(ValidationError):
+            StaffCreateIn(**bad)
+
+
+def test_garcom_nao_entra_nas_rotas_do_gerente():
+    import asyncio
+
+    import pytest
+    from fastapi import HTTPException
+
+    from app.api.deps import require_admin
+
+    class User:
+        role = "garcom"
+
+    with pytest.raises(HTTPException) as erro:
+        asyncio.run(require_admin(User()))  # type: ignore[arg-type]
+    assert erro.value.status_code == 403

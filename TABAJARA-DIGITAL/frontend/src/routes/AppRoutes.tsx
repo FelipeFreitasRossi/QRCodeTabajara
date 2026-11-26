@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { AdminLayout } from '../components/admin/AdminLayout'
 import { RequireAuth } from '../components/admin/RequireAuth'
+import { RequireManager } from '../components/admin/RequireManager'
 import { CartPage } from '../pages/CartPage'
 import { ClubPage } from '../pages/ClubPage'
 import { MenuPage } from '../pages/MenuPage'
@@ -13,6 +14,7 @@ import { ClubAdminPage } from '../pages/admin/ClubAdminPage'
 import { CallsPage } from '../pages/admin/CallsPage'
 import { CategoriesPage } from '../pages/admin/CategoriesPage'
 import { DashboardPage } from '../pages/admin/DashboardPage'
+import { StaffPage } from '../pages/admin/StaffPage'
 import { LoginPage } from '../pages/admin/LoginPage'
 import { OrdersPage } from '../pages/admin/OrdersPage'
 import { ProductFormPage } from '../pages/admin/ProductFormPage'
@@ -42,15 +44,18 @@ export function AppRoutes() {
           </RequireAuth>
         }
       >
-        <Route index element={<DashboardPage />} />
+        {/* Gerente e garçom */}
         <Route path="pedidos" element={<OrdersPage />} />
         <Route path="chamados" element={<CallsPage />} />
-        <Route path="produtos" element={<ProductsPage />} />
-        <Route path="produtos/novo" element={<ProductFormPage />} />
-        <Route path="produtos/:id" element={<ProductFormPage />} />
-        <Route path="categorias" element={<CategoriesPage />} />
         <Route path="mesas" element={<TablesPage />} />
-        <Route path="clube" element={<ClubAdminPage />} />
+        {/* Só gerente (o garçom é levado para Chamados) */}
+        <Route index element={<RequireManager><DashboardPage /></RequireManager>} />
+        <Route path="produtos" element={<RequireManager><ProductsPage /></RequireManager>} />
+        <Route path="produtos/novo" element={<RequireManager><ProductFormPage /></RequireManager>} />
+        <Route path="produtos/:id" element={<RequireManager><ProductFormPage /></RequireManager>} />
+        <Route path="categorias" element={<RequireManager><CategoriesPage /></RequireManager>} />
+        <Route path="clube" element={<RequireManager><ClubAdminPage /></RequireManager>} />
+        <Route path="equipe" element={<RequireManager><StaffPage /></RequireManager>} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

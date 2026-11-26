@@ -102,7 +102,7 @@ export function ConfirmDialog({
 
 interface ChoiceChipsProps<T extends string> {
   label: string
-  options: { value: T; label: string }[]
+  options: { value: T; label: string; icon?: ReactNode }[]
   value: T | null
   onChange: (value: T | null) => void
   /** Permite desmarcar tocando de novo (para escolhas opcionais). */
@@ -125,6 +125,11 @@ export function ChoiceChips<T extends string>({ label, options, value, onChange,
               aria-pressed={selected}
               onClick={() => onChange(selected && allowNone ? null : option.value)}
             >
+              {option.icon && (
+                <span className={styles.chipIcon} aria-hidden="true">
+                  {option.icon}
+                </span>
+              )}
               {option.label}
             </button>
           )

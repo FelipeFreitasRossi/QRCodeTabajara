@@ -159,6 +159,9 @@
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   min-height: 40px;
   padding: 0 14px;
   border-radius: var(--radius-pill);
@@ -207,4 +210,15 @@
   .icon {
     animation: none;
   }
+}
+
+.chipIcon {
+  display: inline-grid;
+  place-items: center;
+  color: var(--c-gold);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.chipOn .chipIcon {
+  color: #17140e;
 }

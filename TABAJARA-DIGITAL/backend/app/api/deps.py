@@ -53,6 +53,25 @@ async def get_current_admin(
     return admin
 
 
+# Perfis do painel. O garçom usa o celular dele: vê chamados, pedidos e contas,
+# mas não mexe em preços, cardápio, Clube, mesas nem na equipe.
+ROLE_ADMIN = "admin"
+ROLE_WAITER = "garcom"
+STAFF_ROLES = (ROLE_ADMIN, ROLE_WAITER)
+
+FORBIDDEN_ROLE = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail="Só o gerente pode fazer isso. Peça a ele para entrar com a conta de gerente.",
+)
+
+
+async def require_admin(admin: AdminUser = Depends(get_current_admin)) -> AdminUser:
+    """Rotas só do gerente. O perfil vem do banco a cada pedido (nunca do navegador)."""
+    if admin.role != ROLE_ADMIN:
+        raise FORBIDDEN_ROLE
+    return admin
+
+
 CUSTOMER_UNAUTHORIZED = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Sua sessão do Clube expirou. Entre novamente com CPF e PIN.",

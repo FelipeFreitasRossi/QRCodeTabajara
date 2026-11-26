@@ -249,3 +249,8 @@
   gap: 14px;
   min-width: 0;
 }
+
+/* Garçom: só a conta de cada mesa, então cabem duas por linha no celular */
+.tableGridCompact {
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}

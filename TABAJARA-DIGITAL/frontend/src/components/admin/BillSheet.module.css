@@ -1,5 +1,5 @@
 .body {
-  padding: 44px var(--page-pad) 24px;
+  padding: 40px var(--page-pad) 24px;
 }
 
 @media (min-width: 768px) {
@@ -224,63 +224,159 @@
   color: var(--c-gold-bright);
 }
 
-/* ---------- pop-up "Fechar a conta?" ---------- */
-.confirmTotal {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-top: 10px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: var(--c-surface);
-  box-shadow: inset 0 0 0 1px var(--c-gold-line);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--c-text-muted);
+
+/* ---------- cabeçalho de comanda ---------- */
+.ticket {
+  position: relative;
+  margin: -4px calc(var(--page-pad) * -1) 18px;
+  padding: 6px var(--page-pad) 18px;
+  border-bottom: 1px dashed var(--c-line-strong);
 }
 
-.confirmTotal strong {
-  font-size: 1.875rem;
-  letter-spacing: 0;
-  color: var(--c-gold-bright);
-}
-
-.successIcon {
-  display: grid;
-  place-items: center;
-  width: 88px;
-  height: 88px;
-  margin-bottom: 12px;
-  border-radius: 50%;
-  color: #17140e;
-  background: linear-gradient(135deg, #b8e0a8, #7fbf6b);
-  box-shadow: 0 20px 50px -20px rgba(127, 191, 107, 0.9);
-  animation: done-pop 560ms cubic-bezier(0.17, 0.89, 0.32, 1.28);
-}
-
-@keyframes done-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.4) rotate(-12deg);
+@media (min-width: 768px) {
+  .ticket {
+    margin: -4px -32px 18px;
+    padding: 6px 32px 18px;
   }
 }
 
-.successTitle {
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 600;
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.successText {
-  font-size: var(--fs-sm);
+.refresh {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-top: 4px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+  color: var(--c-gold);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.refresh:hover:not(:disabled) {
+  background: var(--c-gold-soft);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.facts li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+  font-size: var(--fs-xs);
+  font-weight: 600;
   color: var(--c-text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
+.facts svg {
+  flex: none;
+  color: var(--c-gold);
+}
+
+/* ---------- vazio ---------- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 18px;
+  border: 1px dashed var(--c-line-strong);
+  border-radius: 18px;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+
+.empty strong {
+  font-size: 1.0625rem;
+  color: var(--c-text);
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: var(--c-gold-soft);
+  color: var(--c-gold-bright);
+}
+
+/* ---------- Por pedido / Itens somados ---------- */
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+}
+
+.segment {
+  min-height: 38px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-text-muted);
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.segmentOn {
+  color: #17140e;
+  background: linear-gradient(135deg, var(--c-gold-bright), var(--c-gold));
+}
+
+.order {
+  animation: card-in 380ms var(--ease-out) backwards;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+div.order {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--c-surface);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+}
+
+.itemsSummed {
+  padding-top: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .successIcon {
+  .order {
     animation: none;
   }
 }

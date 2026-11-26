@@ -8,6 +8,8 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   background: var(--c-bg);
+  /* sem zoom de toque duplo (e sem o atraso de 300 ms no toque) */
+  touch-action: manipulation;
 }
 
 body {
